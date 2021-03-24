@@ -6,9 +6,8 @@ const config = {
     width: 900,
     height: 600,
     physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 1000 },
+        default: 'matter',
+        matter: {
             debug: true
         }
     },
@@ -44,43 +43,35 @@ let orangeBall
 function create ()
 {   
 
-    this.add.image(400,300,'background')
-    ground = this.physics.add.staticGroup()
-    ground.create(400,550,'ground')
+    this.add.image(400,300,'background').setDepth(-5)
+    this.matter.world.setBounds(0, 0, game.config.width, game.config.height)
+    ground = this.matter.add.image(400 , 550 , 'ground', null, { isStatic: true}).setDepth(1)
     createJet(this, 130, 0)
     createJet(this, 400, 1)
     createJet(this, 670, 2)
-    // this.add.image(200, 200, "ball")
-    orangeBall = this.physics.add.sprite(850,200, "ball").setInteractive()
-    orangeBall.setScale(.05).setSize(700,700).setCollideWorldBounds(true)
-    this.input.setDraggable(orangeBall)
 
-    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-
-    });
-    
-    this.physics.add.collider(orangeBall, ground)
-    
-    
+    orangeBall = this.matter.add.image(850, 200, 'ball', null, {friction: .5, restitution: .5, shape: 'circle'})
+    orangeBall.setInteractive()
+    this.input.setDraggable(orangeBall);
+    this.input.on("drag", (pointer, gameObject, x, y) => gameObject.setPosition(x, y));
+    this.input.on("dragstart", (pointer, gameObject) => gameObject.setStatic(true));
+    this.input.on("dragend", (pointer, gameObject) => gameObject.setStatic(false));
 }
 
 function update()
 {
-    // this.children.getChildren().forEach((gameObj) => {
-    //     if(gameObj.name.startsWith('air') && overlap(orangeBall, gameObj)){
-
-    //     }
-    // })
+    this.children.getChildren().forEach((gameObj) => {
+        if(gameObj.name.startsWith('air') && this.matter.overlap(orangeBall, gameObj)){
+            console.log(gameObj.getLocalPoint(orangeBall.x, orangeBall.y))
+        }
+    })
 }
 
 function createJet(scene, xPos, jetPos){
-    let air = scene.add.image(xPos, 500, 'airflow').setOrigin(.5,1)
+    let air = scene.matter.add.image(xPos, 500, 'airflow',null,{isStatic:true}).setDepth(-1).setCollisionCategory(null)
     air.name = 'air' + jetPos
     air.scaleY = 2
-    let jet = scene.add.image(xPos, 500, 'jet').setOrigin(.5,1)//.setInteractive()
+    let jet = scene.matter.add.image(xPos, 500, 'jet',null,{isStatic:true})//.setOrigin(.5,1)//.setInteractive()
     jet.name = 'jet' + jetPos
     scene.plugins.get('rexdragrotateplugin').add(scene, {x: xPos, y: 500, maxRadius: 120, minRadius: 0})
     .on('drag', function (dragRotate) {
@@ -90,7 +81,7 @@ function createJet(scene, xPos, jetPos){
             air.rotation = newAngle
         }
     })
-    let base = scene.add.image(xPos, 500, 'base').setInteractive().on('pointerdown', () => {
+    let base = scene.add.image(xPos, 500, 'base').setDepth(1).setInteractive().on('pointerdown', () => {
         jets.enabled[jetPos] = !jets.enabled[jetPos]
         jetPressure(scene, 0)
         jetPressure(scene, 1)
@@ -103,7 +94,10 @@ function jetPressure(scene, jetPos){
     if(!jets.enabled[jetPos]){
         scene.children.getChildren().forEach((gameObj) =>{
             if(gameObj.name === 'air' + jetPos){
+                let currRotate = gameObj.rotation
+                gameObj.rotation = 0
                 gameObj.scaleY = 1
+                gameObj.rotation = currRotate
             }
         })
     }else{
@@ -115,7 +109,10 @@ function jetPressure(scene, jetPos){
         })
         scene.children.getChildren().forEach((gameObj) =>{
             if(gameObj.name === 'air' + jetPos){
+                let currRotate = gameObj.rotation
+                gameObj.rotation = 0
                 gameObj.scaleY = 1 + (jets.totalPressure / enabledJets)
+                gameObj.rotation = currRotate
             }
         })
     }
