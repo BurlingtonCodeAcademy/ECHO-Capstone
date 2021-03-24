@@ -8,7 +8,7 @@ const config = {
     physics: {
         default: 'matter',
         matter: {
-            debug: true
+            debug: false
         }
     },
     scene: {
@@ -63,6 +63,15 @@ function update()
     this.children.getChildren().forEach((gameObj) => {
         if(gameObj.name.startsWith('air') && this.matter.overlap(orangeBall, gameObj)){
             console.log(gameObj.getLocalPoint(orangeBall.x, orangeBall.y))
+            console.log(gameObj.rotation)
+            if(gameObj.getLocalPoint(orangeBall.x, orangeBall.y).y > 8){
+                this.matter.applyForceFromAngle(orangeBall,.0025,gameObj.rotation - (Math.PI / 2))
+            }
+            if(gameObj.getLocalPoint(orangeBall.x,orangeBall.y).x < gameObj.width / 2){
+                this.matter.applyForceFromAngle(orangeBall, .001, gameObj.rotation)
+            }else{
+                this.matter.applyForceFromAngle(orangeBall, .001, gameObj.rotation - Math.PI)
+            }
         }
     })
 }
@@ -71,7 +80,8 @@ function createJet(scene, xPos, jetPos){
     let air = scene.matter.add.image(xPos, 500, 'airflow',null,{isStatic:true}).setDepth(-1).setCollisionCategory(null)
     air.name = 'air' + jetPos
     air.scaleY = 2
-    let jet = scene.matter.add.image(xPos, 500, 'jet',null,{isStatic:true})//.setOrigin(.5,1)//.setInteractive()
+    //air.setVisible(false)
+    let jet = scene.matter.add.image(xPos, 500, 'jet',null,{isStatic:true}).setScale(1.1)//.setOrigin(.5,1)//.setInteractive()
     jet.name = 'jet' + jetPos
     scene.plugins.get('rexdragrotateplugin').add(scene, {x: xPos, y: 500, maxRadius: 120, minRadius: 0})
     .on('drag', function (dragRotate) {
