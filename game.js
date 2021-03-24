@@ -8,7 +8,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 200 },
+            gravity: { y: 1000 },
             debug: true
         }
     },
@@ -39,11 +39,10 @@ let jets = {
     totalPressure: 3,
     enabled: [true,true,true]
 }
+let orangeBall
 
 function create ()
-{
-    this.physics.world.gravity.y = 60
-    
+{   
 
     this.add.image(400,300,'background')
     ground = this.physics.add.staticGroup()
@@ -52,8 +51,8 @@ function create ()
     createJet(this, 400, 1)
     createJet(this, 670, 2)
     // this.add.image(200, 200, "ball")
-    var orangeBall = this.physics.add.sprite(850,200, "ball").setInteractive()
-    orangeBall.setScale(.05).setSize(700,700)
+    orangeBall = this.physics.add.sprite(850,200, "ball").setInteractive()
+    orangeBall.setScale(.05).setSize(700,700).setCollideWorldBounds(true)
     this.input.setDraggable(orangeBall)
 
     this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -70,6 +69,11 @@ function create ()
 
 function update()
 {
+    // this.children.getChildren().forEach((gameObj) => {
+    //     if(gameObj.name.startsWith('air') && overlap(orangeBall, gameObj)){
+
+    //     }
+    // })
 }
 
 function createJet(scene, xPos, jetPos){
