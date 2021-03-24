@@ -24,6 +24,7 @@ function preload ()
     this.load.image('background','assets/background.png')
     this.load.image('ground', 'assets/ground.png')
     this.load.image('jet', 'assets/jet.png')
+    
 
     this.load.plugin('rexdragrotateplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js', true);
 
@@ -33,6 +34,7 @@ let ground
 
 function create ()
 {
+    
     this.add.image(400,300,'background')
     ground = this.physics.add.staticGroup()
     ground.create(400,550,'ground')
@@ -57,3 +59,4 @@ function createJet(scene, xPos){
     })
     return jet;
 }
+
