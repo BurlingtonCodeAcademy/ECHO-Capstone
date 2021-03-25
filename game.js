@@ -1,6 +1,8 @@
 //Orange Ball attributes
 // cartoon ball PNG Designed By 588ku from <a href="https://pngtree.com">Pngtree.com</a>
-// button icons PNG Designed By Alien3287 from <a href="https://pngtree.com/">Pngtree.com</a>
+// start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
+
+
 
 const config = {
   type: Phaser.AUTO,
@@ -21,20 +23,6 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-<<<<<<< HEAD
-function preload ()
-{
-    this.load.image('background','assets/background.png')
-    this.load.image('ground', 'assets/ground.png')
-    this.load.image('jet', 'assets/jet.png')
-    this.load.image("ball", "assets/orangeBall.png")
-    this.load.image('airflow', 'assets/airflow.png')
-    this.load.image('base', 'assets/base.png')
-    this.load.image('button', 'assets/button.png')
-    
-
-    this.load.plugin('rexdragrotateplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js', true);
-=======
 function preload() {
   this.load.image("background", "assets/background.png");
   this.load.image("ground", "assets/ground.png");
@@ -42,7 +30,8 @@ function preload() {
   this.load.image("ball", "assets/orangeBall.png");
   this.load.image("airflow", "assets/airflow.png");
   this.load.image("base", "assets/base.png");
->>>>>>> d9d1c83923d4589ffcff176b73462031709bced2
+  this.load.image("button", "assets/button.png")
+  
 
   this.load.plugin(
     "rexdragrotateplugin",
@@ -51,6 +40,8 @@ function preload() {
   );
 }
 
+let startButton;
+let button;
 let ground;
 let jets = {
   totalPressure: 3,
@@ -59,6 +50,7 @@ let jets = {
 let orangeBall;
 
 function create() {
+ 
   this.add.image(400, 300, "background").setDepth(-5);
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
   ground = this.matter.add
@@ -68,6 +60,7 @@ function create() {
   createJet(this, 400, 1);
   createJet(this, 670, 2);
 
+ 
   orangeBall = this.matter.add.image(850, 200, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
@@ -84,6 +77,18 @@ function create() {
   this.input.on("dragend", (pointer, gameObject) =>
     gameObject.setStatic(false)
   );
+
+  var button = this.add.image(850, 30, "button")
+  button.setScale(.09).setSize(200,200)
+
+  startButton = game.add.button(game.world.width*0.5, game.world.height*0.5, 'button', startGame, this, 1, 0, 2);
+startButton.anchor.set(0.5);
+
+function startGame() {
+    startButton.destroy();
+    ball.body.velocity.set(150, -150);
+    playing = true;
+}
 }
 
 function update() {
@@ -158,34 +163,6 @@ function createJet(scene, xPos, jetPos) {
   return [jet, air, base];
 }
 
-<<<<<<< HEAD
-function jetPressure(scene, jetPos){
-    if(!jets.enabled[jetPos]){
-        scene.children.getChildren().forEach((gameObj) =>{
-            if(gameObj.name === 'air' + jetPos){
-                let currRotate = gameObj.rotation
-                gameObj.rotation = 0
-                gameObj.scaleY = 1
-                gameObj.rotation = currRotate
-            }
-        })
-    }else{
-        let enabledJets = 0;
-        jets.enabled.forEach((enabledBool) => {
-            if(enabledBool){
-                enabledJets++
-            }
-        })
-        scene.children.getChildren().forEach((gameObj) =>{
-            if(gameObj.name === 'air' + jetPos){
-                let currRotate = gameObj.rotation
-                gameObj.rotation = 0
-                gameObj.scaleY = 1 + (jets.totalPressure / enabledJets)
-                gameObj.rotation = currRotate
-            }
-        })
-    }
-=======
 function jetPressure(scene, jetPos) {
   if (!jets.enabled[jetPos]) {
     scene.children.getChildren().forEach((gameObj) => {
@@ -212,5 +189,6 @@ function jetPressure(scene, jetPos) {
       }
     });
   }
->>>>>>> d9d1c83923d4589ffcff176b73462031709bced2
 }
+
+
