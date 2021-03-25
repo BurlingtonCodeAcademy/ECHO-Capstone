@@ -1,7 +1,4 @@
-
 // start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
-
-
 
 const config = {
   type: Phaser.AUTO,
@@ -188,7 +185,7 @@ function createJet(scene, xPos, jetPos) {
       jetPressure(scene, 1);
       jetPressure(scene, 2);
     });
-  return [jet, air, base];
+  return [jet, air, base,];
 }
 
 function jetPressure(scene, jetPos) {
