@@ -1,5 +1,4 @@
-//Orange Ball attributes
-// cartoon ball PNG Designed By 588ku from <a href="https://pngtree.com">Pngtree.com</a>
+
 // start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
 
 
@@ -32,6 +31,8 @@ function preload() {
   this.load.image("base", "assets/base.png");
   this.load.image("button", "assets/button.png")
   
+  this.load.image('hoop', 'assets/hoop.png')
+  this.load.image('hoopFront', 'assets/hoopFront.png')
 
   this.load.plugin(
     "rexdragrotateplugin",
@@ -47,6 +48,10 @@ let jets = {
   totalPressure: 3,
   enabled: [true, true, true],
 };
+let hoops = {
+  passCount: 0,
+  hoopState: ['empty', 'empty']
+}
 let orangeBall;
 
 function create() {
@@ -59,6 +64,8 @@ function create() {
   createJet(this, 130, 0);
   createJet(this, 400, 1);
   createJet(this, 670, 2);
+  createHoop(this, 265, 175, 0)
+  createHoop(this, 535, 225, 1)
 
  
   orangeBall = this.matter.add.image(850, 200, "ball", null, {
@@ -81,8 +88,8 @@ function create() {
   var button = this.add.image(850, 30, "button")
   button.setScale(.09).setSize(200,200)
 
-  startButton = game.add.button(game.world.width*0.5, game.world.height*0.5, 'button', startGame, this, 1, 0, 2);
-startButton.anchor.set(0.5);
+//   startButton = game.add.button(game.world.width*0.5, game.world.height*0.5, 'button', startGame, this, 1, 0, 2);
+// startButton.anchor.set(0.5);
 
 function startGame() {
     startButton.destroy();
@@ -116,6 +123,27 @@ function update() {
           gameObj.rotation - Math.PI
         );
       }
+    }else if(gameObj.name.startsWith('hoop')){
+      let hoopPos = parseInt(gameObj.name[4])
+      if(hoops.hoopState[hoopPos] !== 'empty' && !this.matter.overlap(orangeBall, gameObj)){
+        if(hoops.hoopState[hoopPos] === 'enteredRight' && gameObj.getLocalPoint(orangeBall.x,orangeBall.y).x < gameObj.width / 2){
+          hoops.passCount += 1
+        }else if(hoops.hoopState[hoopPos] === 'enteredLeft' && gameObj.getLocalPoint(orangeBall.x,orangeBall.y).x > gameObj.width / 2){
+          hoops.passCount += 1
+        }
+        console.log(hoops.passCount)
+        hoops.hoopState[hoopPos] = 'empty'
+      }else if(hoops.hoopState[hoopPos] === 'empty' && this.matter.overlap(orangeBall, gameObj)){
+        if(orangeBall.isStatic()){
+          hoops.hoopState[hoopPos] = 'drag'
+        }else if(gameObj.getLocalPoint(orangeBall.x, orangeBall.y).x > gameObj.width / 2){
+          hoops.hoopState[hoopPos] = 'enteredRight'
+        }else{
+          hoops.hoopState[hoopPos] = 'enteredLeft'
+        }
+      }else if(hoops.hoopState[hoopPos].startsWith('entered') && orangeBall.isStatic()){
+        hoops.hoopState[hoopPos] = 'drag'
+      }
     }
   });
 }
@@ -127,10 +155,10 @@ function createJet(scene, xPos, jetPos) {
     .setCollisionCategory(null);
   air.name = "air" + jetPos;
   air.scaleY = 2;
-  //air.setVisible(false)
+  // air.setVisible(false)
   let jet = scene.matter.add
     .image(xPos, 500, "jet", null, { isStatic: true })
-    .setScale(1.1); //.setOrigin(.5,1)//.setInteractive()
+    .setScale(1.1);
   jet.name = "jet" + jetPos;
   scene.plugins
     .get("rexdragrotateplugin")
@@ -191,4 +219,13 @@ function jetPressure(scene, jetPos) {
   }
 }
 
-
+function createHoop(scene, xPos, yPos, hoopPos){
+  let hoop = scene.matter.add.image(xPos, yPos, 'hoop', null, {isStatic: true}).setCollisionCategory(null)
+  hoop.name = 'hoop' + hoopPos
+  let hoopFront = scene.add.image(xPos - 16, yPos, 'hoopFront').setDepth(5)
+  let hoopTop = scene.matter.add.rectangle(xPos,yPos - 54, 12, 8, {isStatic:true})
+  //hoopTop.setVisible(false)
+  let hoopBottom = scene.matter.add.rectangle(xPos,yPos + 54, 12, 8, {isStatic:true})
+  //hoopBottom.setVisible(false)
+  return [hoop, hoopFront, hoopTop, hoopBottom]
+}
