@@ -1,7 +1,4 @@
-
 // start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
-
-
 
 const config = {
   type: Phaser.AUTO,
@@ -29,10 +26,10 @@ function preload() {
   this.load.image("ball", "assets/orangeBall.png");
   this.load.image("airflow", "assets/airflow.png");
   this.load.image("base", "assets/base.png");
-  this.load.image("button", "assets/button.png")
-  
-  this.load.image('hoop', 'assets/hoop.png')
-  this.load.image('hoopFront', 'assets/hoopFront.png')
+  this.load.image("button", "assets/button.png");
+
+  this.load.image("hoop", "assets/hoop.png");
+  this.load.image("hoopFront", "assets/hoopFront.png");
 
   this.load.plugin(
     "rexdragrotateplugin",
@@ -50,16 +47,17 @@ let jets = {
 };
 let hoops = {
   passCount: 0,
-  hoopState: ['empty', 'empty']
-}
+  hoopState: {},
+};
 let gameState = {
   running: false,
-  gameEnd: 0
-}
+  gameEnd: 0,
+  objectsArr: []
+};
 let orangeBall;
+let ball2;
 
 function create() {
- 
   this.add.image(400, 300, "background").setDepth(-5);
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
   ground = this.matter.add
@@ -68,17 +66,26 @@ function create() {
   createJet(this, 130, 0);
   createJet(this, 400, 1);
   createJet(this, 670, 2);
-  createHoop(this, 265, 175, 0)
-  createHoop(this, 535, 225, 1)
+  createHoop(this, 265, 175, 0);
+  createHoop(this, 535, 225, 1);
 
- 
+
   orangeBall = this.matter.add.image(850, 200, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
   orangeBall.setInteractive();
+  orangeBall.name = 'ballA'
   this.input.setDraggable(orangeBall);
+  ball2 = this.matter.add.image(850, 180, "ball", null, {
+    friction: 0.5,
+    restitution: 0.5,
+    shape: "circle",
+  });
+  ball2.setInteractive();
+  ball2.name = 'ballB'
+  this.input.setDraggable(ball2);
   this.input.on("drag", (pointer, gameObject, x, y) =>
     gameObject.setPosition(x, y)
   );
@@ -89,79 +96,114 @@ function create() {
     gameObject.setStatic(false)
   );
 
-  startButton = this.add.image(850, 30, "button").setInteractive().on('pointerdown', () => {
-    if(!gameState.running){
-      gameState.running = true
-      jets.enabled[0] = true
-      jets.enabled[1] = true
-      jets.enabled[2] = true
-      jetPressure(this, 0);
-      jetPressure(this, 1);
-      jetPressure(this, 2);
-      hoops.passCount = 0
-      gameState.gameEnd = Date.now() + 25000
-    }
-  })
-  startButton.setScale(.09).setSize(200,200)
+  gameState.objectsArr.push(orangeBall)
+  gameState.objectsArr.push(ball2)
 
+  gameState.objectsArr.forEach((gameObj) => {
+    hoops.hoopState[gameObj.name] = ['empty' , 'empty']
+  })
+
+  startButton = this.add
+    .image(850, 30, "button")
+    .setInteractive()
+    .on("pointerdown", () => {
+      if (!gameState.running) {
+        gameState.running = true;
+        jets.enabled[0] = true;
+        jets.enabled[1] = true;
+        jets.enabled[2] = true;
+        jetPressure(this, 0);
+        jetPressure(this, 1);
+        jetPressure(this, 2);
+        hoops.passCount = 0;
+        gameState.gameEnd = Date.now() + 25000;
+      }
+    });
+  startButton.setScale(0.09).setSize(200, 200);
 }
 
 function update() {
-  if(gameState.running && Date.now() > gameState.gameEnd){
-    gameState.running = false
-    jets.enabled[0] = false
-    jets.enabled[1] = false
-    jets.enabled[2] = false
+  if (gameState.running && Date.now() > gameState.gameEnd) {
+    gameState.running = false;
+    jets.enabled[0] = false;
+    jets.enabled[1] = false;
+    jets.enabled[2] = false;
     jetPressure(this, 0);
-      jetPressure(this, 1);
-      jetPressure(this, 2);
-    console.log('Your score was ' + hoops.passCount)
+    jetPressure(this, 1);
+    jetPressure(this, 2);
+    console.log("Your score was " + hoops.passCount);
   }
   this.children.getChildren().forEach((gameObj) => {
     if (
       gameObj.name.startsWith("air") &&
-      this.matter.overlap(orangeBall, gameObj)
+      this.matter.overlap(gameObj, gameState.objectsArr)
     ) {
-      if (gameObj.getLocalPoint(orangeBall.x, orangeBall.y).y > 8) {
-        this.matter.applyForceFromAngle(
-          orangeBall,
-          0.0025,
-          gameObj.rotation - Math.PI / 2
-        );
-      }
-      if (
-        gameObj.getLocalPoint(orangeBall.x, orangeBall.y).x <
-        gameObj.width / 2
-      ) {
-        this.matter.applyForceFromAngle(orangeBall, 0.001, gameObj.rotation);
-      } else {
-        this.matter.applyForceFromAngle(
-          orangeBall,
-          0.001,
-          gameObj.rotation - Math.PI
-        );
-      }
-    }else if(gameObj.name.startsWith('hoop')){
-      let hoopPos = parseInt(gameObj.name[4])
-      if(hoops.hoopState[hoopPos] !== 'empty' && !this.matter.overlap(orangeBall, gameObj)){
-        if(hoops.hoopState[hoopPos] === 'enteredRight' && gameObj.getLocalPoint(orangeBall.x,orangeBall.y).x < gameObj.width / 2){
-          hoops.passCount += 1
-        }else if(hoops.hoopState[hoopPos] === 'enteredLeft' && gameObj.getLocalPoint(orangeBall.x,orangeBall.y).x > gameObj.width / 2){
-          hoops.passCount += 1
+      gameState.objectsArr.forEach((floatObj) => {
+        if(this.matter.overlap(gameObj, floatObj)){
+          if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8) {
+            this.matter.applyForceFromAngle(
+              floatObj,
+              0.0025,
+              gameObj.rotation - Math.PI / 2
+            );
+          }
+          if (
+            gameObj.getLocalPoint(floatObj.x, floatObj.y).x <
+            gameObj.width / 2
+          ) {
+            this.matter.applyForceFromAngle(floatObj, 0.001, gameObj.rotation);
+          } else {
+            this.matter.applyForceFromAngle(
+              floatObj,
+              0.001,
+              gameObj.rotation - Math.PI
+            );
+          }
         }
-        console.log(hoops.passCount)
-        hoops.hoopState[hoopPos] = 'empty'
-      }else if(hoops.hoopState[hoopPos] === 'empty' && this.matter.overlap(orangeBall, gameObj)){
-        if(orangeBall.isStatic()){
-          hoops.hoopState[hoopPos] = 'drag'
-        }else if(gameObj.getLocalPoint(orangeBall.x, orangeBall.y).x > gameObj.width / 2){
-          hoops.hoopState[hoopPos] = 'enteredRight'
-        }else{
-          hoops.hoopState[hoopPos] = 'enteredLeft'
+      })
+    } else if (gameObj.name.startsWith("hoop")) {
+      let hoopPos = parseInt(gameObj.name[4]);
+      gameState.objectsArr.forEach((scoreObj) => {
+        if (
+          hoops.hoopState[scoreObj.name][hoopPos] !== "empty" &&
+          !this.matter.overlap(scoreObj, gameObj)
+        ) {
+          if (
+            hoops.hoopState[scoreObj.name][hoopPos] === "enteredRight" &&
+            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x <
+              gameObj.width / 2
+          ) {
+            hoops.passCount += 1;
+          } else if (
+            hoops.hoopState[scoreObj.name][hoopPos] === "enteredLeft" &&
+            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x >
+              gameObj.width / 2
+          ) {
+            hoops.passCount += 1;
+          }
+          console.log(hoops.passCount);
+          hoops.hoopState[scoreObj.name][hoopPos] = "empty";
+        } else if (
+          hoops.hoopState[scoreObj.name][hoopPos] === "empty" &&
+          this.matter.overlap(scoreObj, gameObj)
+        ) {
+          if (scoreObj.isStatic()) {
+            hoops.hoopState[scoreObj.name][hoopPos] = "drag";
+          } else if (
+            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x >
+            gameObj.width / 2
+          ) {
+            hoops.hoopState[scoreObj.name][hoopPos] = "enteredRight";
+          } else {
+            hoops.hoopState[scoreObj.name][hoopPos] = "enteredLeft";
+          }
+        } else if (
+          hoops.hoopState[scoreObj.name][hoopPos].startsWith("entered") &&
+          scoreObj.isStatic()
+        ) {
+          hoops.hoopState[scoreObj.name][hoopPos] = "drag";
         }
-      }else if(hoops.hoopState[hoopPos].startsWith('entered') && orangeBall.isStatic()){
-        hoops.hoopState[hoopPos] = 'drag'
-      }
+      })
     }
   });
 }
@@ -201,11 +243,11 @@ function createJet(scene, xPos, jetPos) {
     .setDepth(1)
     .setInteractive()
     .on("pointerdown", () => {
-      if(gameState.running){
+      if (gameState.running) {
         jets.enabled[jetPos] = !jets.enabled[jetPos];
-      jetPressure(scene, 0);
-      jetPressure(scene, 1);
-      jetPressure(scene, 2);
+        jetPressure(scene, 0);
+        jetPressure(scene, 1);
+        jetPressure(scene, 2);
       }
     });
   return [jet, air, base];
@@ -239,13 +281,19 @@ function jetPressure(scene, jetPos) {
   }
 }
 
-function createHoop(scene, xPos, yPos, hoopPos){
-  let hoop = scene.matter.add.image(xPos, yPos, 'hoop', null, {isStatic: true}).setCollisionCategory(null)
-  hoop.name = 'hoop' + hoopPos
-  let hoopFront = scene.add.image(xPos - 16, yPos, 'hoopFront').setDepth(5)
-  let hoopTop = scene.matter.add.rectangle(xPos,yPos - 54, 12, 8, {isStatic:true})
+function createHoop(scene, xPos, yPos, hoopPos) {
+  let hoop = scene.matter.add
+    .image(xPos, yPos, "hoop", null, { isStatic: true })
+    .setCollisionCategory(null);
+  hoop.name = "hoop" + hoopPos;
+  let hoopFront = scene.add.image(xPos - 16, yPos, "hoopFront").setDepth(5);
+  let hoopTop = scene.matter.add.rectangle(xPos, yPos - 54, 12, 8, {
+    isStatic: true,
+  });
   //hoopTop.setVisible(false)
-  let hoopBottom = scene.matter.add.rectangle(xPos,yPos + 54, 12, 8, {isStatic:true})
+  let hoopBottom = scene.matter.add.rectangle(xPos, yPos + 54, 12, 8, {
+    isStatic: true,
+  });
   //hoopBottom.setVisible(false)
-  return [hoop, hoopFront, hoopTop, hoopBottom]
+  return [hoop, hoopFront, hoopTop, hoopBottom];
 }
