@@ -43,11 +43,15 @@ let button;
 let ground;
 let jets = {
   totalPressure: 3,
-  enabled: [true, true, true],
+  enabled: [false, false, false],
 };
 let hoops = {
   passCount: 0,
   hoopState: ['empty', 'empty']
+}
+let gameState = {
+  running: false,
+  gameEnd: 0
 }
 let orangeBall;
 
@@ -82,20 +86,34 @@ function create() {
     gameObject.setStatic(false)
   );
 
-  var button = this.add.image(850, 30, "button")
-  button.setScale(.09).setSize(200,200)
+  startButton = this.add.image(850, 30, "button").setInteractive().on('pointerdown', () => {
+    if(!gameState.running){
+      gameState.running = true
+      jets.enabled[0] = true
+      jets.enabled[1] = true
+      jets.enabled[2] = true
+      jetPressure(this, 0);
+      jetPressure(this, 1);
+      jetPressure(this, 2);
+      hoops.passCount = 0
+      gameState.gameEnd = Date.now() + 25000
+    }
+  })
+  startButton.setScale(.09).setSize(200,200)
 
-//   startButton = game.add.button(game.world.width*0.5, game.world.height*0.5, 'button', startGame, this, 1, 0, 2);
-// startButton.anchor.set(0.5);
-
-function startGame() {
-    startButton.destroy();
-    ball.body.velocity.set(150, -150);
-    playing = true;
-}
 }
 
 function update() {
+  if(gameState.running && Date.now() > gameState.gameEnd){
+    gameState.running = false
+    jets.enabled[0] = false
+    jets.enabled[1] = false
+    jets.enabled[2] = false
+    jetPressure(this, 0);
+      jetPressure(this, 1);
+      jetPressure(this, 2);
+    console.log('Your score was ' + hoops.passCount)
+  }
   this.children.getChildren().forEach((gameObj) => {
     if (
       gameObj.name.startsWith("air") &&
@@ -151,7 +169,7 @@ function createJet(scene, xPos, jetPos) {
     .setDepth(-1)
     .setCollisionCategory(null);
   air.name = "air" + jetPos;
-  air.scaleY = 2;
+  air.scaleY = 1;
   // air.setVisible(false)
   let jet = scene.matter.add
     .image(xPos, 500, "jet", null, { isStatic: true })
@@ -180,10 +198,12 @@ function createJet(scene, xPos, jetPos) {
     .setDepth(1)
     .setInteractive()
     .on("pointerdown", () => {
-      jets.enabled[jetPos] = !jets.enabled[jetPos];
+      if(gameState.running){
+        jets.enabled[jetPos] = !jets.enabled[jetPos];
       jetPressure(scene, 0);
       jetPressure(scene, 1);
       jetPressure(scene, 2);
+      }
     });
   return [jet, air, base,];
 }
