@@ -83,6 +83,7 @@ function create() {
     .setDepth(1);
   scoreDisplay = this.add.text(40, 530, 'Score: ' + hoops.passCount).setDepth(2)
   highDisplay = this.add.text(30, 550, 'High Score: ' + gameState.highScore).setDepth(2)
+  this.matter.add.rectangle(801, 300, 3, 600, {isStatic: true})
   
   //create jets and hoops
   createJet(this, 130, 0);
@@ -99,6 +100,7 @@ function create() {
   });
   orangeBall.setInteractive();
   orangeBall.name = 'ballA'
+  //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
   ball2 = this.matter.add.image(850, 200, "ball", null, {
     friction: 0.5,
@@ -123,7 +125,9 @@ function create() {
   );
   this.input.on("dragstart", (pointer, gameObject) =>
     {
-      gameObject.setStatic(true)
+      if(!gameObject.isStatic()){
+        gameObject.setStatic(true)
+      }
       //while the game is running, apply a score penalty for dragging objects
       if(gameState.running){
         hoops.passCount -= Math.floor(gameState.objData[gameObject.name].scoreVal * 0.4)
@@ -132,7 +136,9 @@ function create() {
     }
   );
   this.input.on("dragend", (pointer, gameObject) =>
-    gameObject.setStatic(false)
+    {
+      gameObject.setStatic(false)
+    }
   );
 
   //add floatable objects to gameState's array and fill out objData
@@ -174,6 +180,11 @@ function create() {
 
 //update function, runs repeatedly while phaser is loaded
 function update() {
+  gameState.objectsArr.forEach((gameObj) => {
+    if(gameObj.x > 800 && !gameObj.isStatic()){
+      gameObj.setStatic(true)
+    }
+  })
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
