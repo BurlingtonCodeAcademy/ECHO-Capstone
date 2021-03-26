@@ -35,6 +35,7 @@ function preload() {
   this.load.audio("airFlow", ["assets/sfx/airflow.mp3"])
   //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
 
+  this.load.image('square', 'assets/redSquare.png')
   this.load.image("hoop", "assets/hoop.png");
   this.load.image("hoopFront", "assets/hoopFront.png");
 
@@ -51,6 +52,9 @@ let button;
 let ground;
 let orangeBall;
 let ball2;
+let redSquare;
+let scoreDisplay;
+let highDisplay;
 //state trackers
 let jets = {
   totalPressure: 3,
@@ -63,18 +67,22 @@ let hoops = {
 let gameState = {
   running: false,
   gameEnd: 0,
-  objectsArr: []
+  highScore: 0,
+  objectsArr: [],
+  objData: {}
 };
 
 
 //create function, phaser calls it once when setting up
 function create() {
-  //create background, ground, and set world bounds
+  //create background, ground, set world bounds, and display score and high score
   this.add.image(400, 300, "background").setDepth(-5);
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
   ground = this.matter.add
     .image(400, 550, "ground", null, { isStatic: true })
     .setDepth(1);
+  scoreDisplay = this.add.text(40, 530, 'Score: ' + hoops.passCount).setDepth(2)
+  highDisplay = this.add.text(30, 550, 'High Score: ' + gameState.highScore).setDepth(2)
   
   //create jets and hoops
   createJet(this, 130, 0);
@@ -84,7 +92,7 @@ function create() {
   createHoop(this, 535, 225, 1);
 
   //create floatable objects
-  orangeBall = this.matter.add.image(850, 200, "ball", null, {
+  orangeBall = this.matter.add.image(850, 180, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -92,29 +100,48 @@ function create() {
   orangeBall.setInteractive();
   orangeBall.name = 'ballA'
   this.input.setDraggable(orangeBall);
-  ball2 = this.matter.add.image(850, 180, "ball", null, {
+  ball2 = this.matter.add.image(850, 200, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-  ball2.setInteractive();
+  ball2.setInteractive().setScale(2);
   ball2.name = 'ballB'
+  ball2.tint = 0x808080
   this.input.setDraggable(ball2);
+  redSquare = this.matter.add.image(850, 220, 'square', null, {friction: 0.7, restitution: 0.3})
+  redSquare.setInteractive()
+  redSquare.name = 'squareA'
+  redSquare.tint = 0x808080
+  this.input.setDraggable(redSquare)
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) =>
-    gameObject.setPosition(x, y)
+    {if(gameState.objData[gameObject.name].unlockAt <= gameState.highScore){
+      gameObject.setPosition(x, y)
+    }}
   );
   this.input.on("dragstart", (pointer, gameObject) =>
-    gameObject.setStatic(true)
+    {
+      gameObject.setStatic(true)
+      //while the game is running, apply a score penalty for dragging objects
+      if(gameState.running){
+        hoops.passCount -= Math.floor(gameState.objData[gameObject.name].scoreVal * 0.4)
+        scoreDisplay.text = 'Score: ' + hoops.passCount
+      }
+    }
   );
   this.input.on("dragend", (pointer, gameObject) =>
     gameObject.setStatic(false)
   );
 
-  //add floatable objects to gameState's array
+  //add floatable objects to gameState's array and fill out objData
   gameState.objectsArr.push(orangeBall)
+  gameState.objData[orangeBall.name] = {scoreVal: 50, airEff: 1, unlockAt: 0}
   gameState.objectsArr.push(ball2)
+  gameState.objData[ball2.name] = {scoreVal: 100, airEff: 2, unlockAt: 200}
+  gameState.objectsArr.push(redSquare)
+  gameState.objData[redSquare.name] = {scoreVal: 150, airEff: 0.8, unlockAt: 350}
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -138,6 +165,7 @@ function create() {
         jetPressure(this, 1);
         jetPressure(this, 2);
         hoops.passCount = 0;
+        scoreDisplay.text = 'Score: ' + hoops.passCount
         gameState.gameEnd = Date.now() + 25000;
       }
     });
@@ -156,7 +184,6 @@ function update() {
     jetPressure(this, 0);
     jetPressure(this, 1);
     jetPressure(this, 2);
-    console.log("Your score was " + hoops.passCount);
   }
   //loop through all game objects in scene
   this.children.getChildren().forEach((gameObj) => {
@@ -173,7 +200,7 @@ function update() {
           if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8) {
             this.matter.applyForceFromAngle(
               floatObj,
-              0.0025,
+              0.0025 * gameState.objData[floatObj.name].airEff,
               //phaser's object rotation angles and matter physics force angles are both radians but 0 is a different direction
               gameObj.rotation - Math.PI / 2
             );
@@ -187,7 +214,7 @@ function update() {
           } else {
             this.matter.applyForceFromAngle(
               floatObj,
-              0.001,
+              0.001 * gameState.objData[floatObj.name].airEff,
               gameObj.rotation - Math.PI
             );
           }
@@ -206,21 +233,43 @@ function update() {
         ) {
           //check to see if the object properly passed through the hoop,
           //(was not dragged at any point and left from opposite side the object entered from)
-          //if so add a point, set state to empty regardless
+          //if so add score based on object's value, and check if high score should be updated
+          //set state to empty regardless
           if (
             hoops.hoopState[scoreObj.name][hoopPos] === "enteredRight" &&
             gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x <
               gameObj.width / 2
           ) {
-            hoops.passCount += 1;
+            hoops.passCount += gameState.objData[scoreObj.name].scoreVal;
+            scoreDisplay.text = 'Score: ' + hoops.passCount
+            if(hoops.passCount > gameState.highScore){
+              gameState.highScore = hoops.passCount
+              highDisplay.text = 'High Score: ' + gameState.highScore
+              //determine if the increase in high score has unlocked any objects
+              gameState.objectsArr.forEach((unlockObj) => {
+                if(unlockObj.isTinted && gameState.objData[unlockObj.name].unlockAt <= gameState.highScore){
+                  unlockObj.clearTint()
+                }
+              })
+            }
           } else if (
             hoops.hoopState[scoreObj.name][hoopPos] === "enteredLeft" &&
             gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x >
               gameObj.width / 2
           ) {
-            hoops.passCount += 1;
+            hoops.passCount += gameState.objData[scoreObj.name].scoreVal;
+            scoreDisplay.text = 'Score: ' + hoops.passCount
+            if(hoops.passCount > gameState.highScore){
+              gameState.highScore = hoops.passCount
+              highDisplay.text = 'High Score: ' + gameState.highScore
+              //determine if the increase in high score has unlocked any objects
+              gameState.objectsArr.forEach((unlockObj) => {
+                if(unlockObj.isTinted && gameState.objData[unlockObj.name].unlockAt <= gameState.highScore){
+                  unlockObj.clearTint()
+                }
+              })
+            }
           }
-          console.log(hoops.passCount);
           hoops.hoopState[scoreObj.name][hoopPos] = "empty";
           //if the hoop was empty last update and isn't now figure out what side the object
           //is entering from and if it is being dragged
