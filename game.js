@@ -102,7 +102,7 @@ function create() {
   orangeBall.name = 'ballA'
   //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
-  ball2 = this.matter.add.image(850, 200, "ball", null, {
+  ball2 = this.matter.add.image(850, 230, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -111,7 +111,7 @@ function create() {
   ball2.name = 'ballB'
   ball2.tint = 0x808080
   this.input.setDraggable(ball2);
-  redSquare = this.matter.add.image(850, 220, 'square', null, {friction: 0.7, restitution: 0.3})
+  redSquare = this.matter.add.image(850, 280, 'square', null, {friction: 0.7, restitution: 0.3})
   redSquare.setInteractive()
   redSquare.name = 'squareA'
   redSquare.tint = 0x808080
@@ -125,6 +125,7 @@ function create() {
   );
   this.input.on("dragstart", (pointer, gameObject) =>
     {
+      gameObject.setCollisionCategory(null)
       if(!gameObject.isStatic()){
         gameObject.setStatic(true)
       }
@@ -137,6 +138,7 @@ function create() {
   );
   this.input.on("dragend", (pointer, gameObject) =>
     {
+      gameObject.setCollisionCategory(1)
       gameObject.setStatic(false)
     }
   );
@@ -176,6 +178,7 @@ function create() {
       }
     });
   startButton.setScale(0.09).setSize(200, 200);
+  console.log(ball2)
 }
 
 //update function, runs repeatedly while phaser is loaded
