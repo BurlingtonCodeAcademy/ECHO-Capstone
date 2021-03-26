@@ -11,7 +11,13 @@ h1 {
     
 }
 
-.game {
+/* .game {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+} */
+
+.video {
     display: flex;
     justify-content: center;
     margin-top: 50px;
