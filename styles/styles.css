@@ -3,8 +3,16 @@ h1 {
     justify-content: center;
 }
 
+
 .button {
+    margin-top: 30px;
     display: flex;
     justify-content: center;
+    
 }
 
+.game {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
