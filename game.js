@@ -30,6 +30,7 @@ function preload() {
   this.load.image("airflow", "assets/airflow.png");
   this.load.image("base", "assets/base.png");
   this.load.image("button", "assets/button.png");
+  this.load.image("sidebar", "assets/sidebar2.png");
 
   this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
@@ -56,6 +57,7 @@ let ball2;
 let redSquare;
 let scoreDisplay;
 let highDisplay;
+
 //state trackers
 let jets = {
   totalPressure: 3,
@@ -97,7 +99,7 @@ function create() {
   createHoop(this, 535, 225, 1);
 
   //create floatable objects
-  orangeBall = this.matter.add.image(850, 180, "ball", null, {
+  orangeBall = this.matter.add.image(850, 180 , "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -161,14 +163,16 @@ function create() {
 
   //add floatable objects to gameState's array and fill out objData
   gameState.objectsArr.push(orangeBall);
-  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, unlockAt: 0 };
+  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, unlockAt: 0, homeX: 850, homeY: 180 };
   gameState.objectsArr.push(ball2);
-  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, unlockAt: 200 };
+  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, unlockAt: 200, homeX: 850, homeY: 300 };
   gameState.objectsArr.push(redSquare);
   gameState.objData[redSquare.name] = {
     scoreVal: 150,
     airEff: 0.8,
     unlockAt: 350,
+    homeX: 850,
+    homeY: 400
   };
 
   //use gameState's array to populate hoopState
@@ -199,12 +203,14 @@ function create() {
     });
   startButton.setScale(0.09).setSize(200, 200);
 }
-
+//---------------------------------------------------------------------------------------------
 //update function, runs repeatedly while phaser is loaded
 function update() {
   gameState.objectsArr.forEach((gameObj) => {
     if (gameObj.x > 800 && !gameObj.isStatic()) {
       gameObj.setStatic(true);
+      gameObj.x = gameState.objData[gameObj.name].homeX
+      gameObj.y = gameState.objData[gameObj.name].homeY
     }
   });
   //check for game end
