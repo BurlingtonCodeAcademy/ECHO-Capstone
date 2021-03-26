@@ -106,7 +106,7 @@ function create() {
   orangeBall.name = "ballA";
   //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
-  ball2 = this.matter.add.image(850, 300, "ball", null, {
+  ball2 = this.matter.add.image(850, 230, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -115,7 +115,7 @@ function create() {
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
-  redSquare = this.matter.add.image(850, 400, "square", null, {
+  redSquare = this.matter.add.image(850, 280, "square", null, {
     friction: 0.7,
     restitution: 0.3,
   });
@@ -131,9 +131,22 @@ function create() {
     }
   });
   this.input.on("dragstart", (pointer, gameObject) => {
+    gameObject.setCollisionCategory(null);
     if (!gameObject.isStatic()) {
       gameObject.setStatic(true);
     }
+    //while the game is running, apply a score penalty for dragging objects
+    if (gameState.running) {
+      hoops.passCount -= Math.floor(
+        gameState.objData[gameObject.name].scoreVal * 0.4
+      );
+      scoreDisplay.text = "Score: " + hoops.passCount;
+    }
+  });
+  this.input.on("dragend", (pointer, gameObject) => {
+    gameObject.setCollisionCategory(1);
+    gameObject.setStatic(false);
+
     //while the game is running, apply a score penalty for dragging objects
     if (gameState.running) {
       hoops.passCount -= Math.floor(
@@ -434,13 +447,15 @@ function createHoop(scene, xPos, yPos, hoopPos) {
   return [hoop, hoopFront, hoopTop, hoopBottom];
 }
 
-//work in progress
-// function createSound() {
-//     this.ballBounce = this.add.audio("ballBounce")
-//     this.airFlow = this.add.audio("airFlow")
+//create sound effects, still work in progress
+function createSound() {
+  this.ballBounce = this.add.audio("ballBounce");
+  this.airFlow = this.add.audio("airFlow");
 
-//     if(gameObject.collides){
-//         this.ballBounce.play();
-
-//     }
-// }
+  if (gameObject.collides) {
+    this.ballBounce.play();
+  }
+  if (jets.enabled) {
+    this.airFlow.play(loop); //
+  }
+}
