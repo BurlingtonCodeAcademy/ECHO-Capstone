@@ -1,6 +1,5 @@
 // start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
 
-
 //setup phaser
 const config = {
   type: Phaser.AUTO,
@@ -30,12 +29,13 @@ function preload() {
   this.load.image("airflow", "assets/airflow.png");
   this.load.image("base", "assets/base.png");
   this.load.image("button", "assets/button.png");
+  this.load.image("sidebar", "assets/sidebar2.png");
 
-  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"])
-  this.load.audio("airFlow", ["assets/sfx/airflow.mp3"])
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
   //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
 
-  this.load.image('square', 'assets/redSquare.png')
+  this.load.image("square", "assets/redSquare.png");
   this.load.image("hoop", "assets/hoop.png");
   this.load.image("hoopFront", "assets/hoopFront.png");
 
@@ -55,6 +55,7 @@ let ball2;
 let redSquare;
 let scoreDisplay;
 let highDisplay;
+
 //state trackers
 let jets = {
   totalPressure: 3,
@@ -69,9 +70,8 @@ let gameState = {
   gameEnd: 0,
   highScore: 0,
   objectsArr: [],
-  objData: {}
+  objData: {},
 };
-
 
 //create function, phaser calls it once when setting up
 function create() {
@@ -81,10 +81,14 @@ function create() {
   ground = this.matter.add
     .image(400, 550, "ground", null, { isStatic: true })
     .setDepth(1);
-  scoreDisplay = this.add.text(40, 530, 'Score: ' + hoops.passCount).setDepth(2)
-  highDisplay = this.add.text(30, 550, 'High Score: ' + gameState.highScore).setDepth(2)
-  this.matter.add.rectangle(801, 300, 3, 600, {isStatic: true})
-  
+  scoreDisplay = this.add
+    .text(40, 530, "Score: " + hoops.passCount)
+    .setDepth(2);
+  highDisplay = this.add
+    .text(30, 550, "High Score: " + gameState.highScore)
+    .setDepth(2);
+  this.matter.add.rectangle(801, 300, 3, 600, { isStatic: true });
+
   //create jets and hoops
   createJet(this, 130, 0);
   createJet(this, 400, 1);
@@ -93,66 +97,73 @@ function create() {
   createHoop(this, 535, 225, 1);
 
   //create floatable objects
-  orangeBall = this.matter.add.image(850, 180, "ball", null, {
+  orangeBall = this.matter.add.image(850, 180 , "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
   orangeBall.setInteractive();
-  orangeBall.name = 'ballA'
+  orangeBall.name = "ballA";
   //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
-  ball2 = this.matter.add.image(850, 200, "ball", null, {
+  ball2 = this.matter.add.image(850, 300, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
   ball2.setInteractive().setScale(2);
-  ball2.name = 'ballB'
-  ball2.tint = 0x808080
+  ball2.name = "ballB";
+  ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
-  redSquare = this.matter.add.image(850, 220, 'square', null, {friction: 0.7, restitution: 0.3})
-  redSquare.setInteractive()
-  redSquare.name = 'squareA'
-  redSquare.tint = 0x808080
-  this.input.setDraggable(redSquare)
+  redSquare = this.matter.add.image(850, 400, "square", null, {
+    friction: 0.7,
+    restitution: 0.3,
+  });
+  redSquare.setInteractive();
+  redSquare.name = "squareA";
+  redSquare.tint = 0x808080;
+  this.input.setDraggable(redSquare);
 
   //drag events
-  this.input.on("drag", (pointer, gameObject, x, y) =>
-    {if(gameState.objData[gameObject.name].unlockAt <= gameState.highScore){
-      gameObject.setPosition(x, y)
-    }}
-  );
-  this.input.on("dragstart", (pointer, gameObject) =>
-    {
-      if(!gameObject.isStatic()){
-        gameObject.setStatic(true)
-      }
-      //while the game is running, apply a score penalty for dragging objects
-      if(gameState.running){
-        hoops.passCount -= Math.floor(gameState.objData[gameObject.name].scoreVal * 0.4)
-        scoreDisplay.text = 'Score: ' + hoops.passCount
-      }
+  this.input.on("drag", (pointer, gameObject, x, y) => {
+    if (gameState.objData[gameObject.name].unlockAt <= gameState.highScore) {
+      gameObject.setPosition(x, y);
     }
-  );
-  this.input.on("dragend", (pointer, gameObject) =>
-    {
-      gameObject.setStatic(false)
+  });
+  this.input.on("dragstart", (pointer, gameObject) => {
+    if (!gameObject.isStatic()) {
+      gameObject.setStatic(true);
     }
-  );
+    //while the game is running, apply a score penalty for dragging objects
+    if (gameState.running) {
+      hoops.passCount -= Math.floor(
+        gameState.objData[gameObject.name].scoreVal * 0.4
+      );
+      scoreDisplay.text = "Score: " + hoops.passCount;
+    }
+  });
+  this.input.on("dragend", (pointer, gameObject) => {
+    gameObject.setStatic(false);
+  });
 
   //add floatable objects to gameState's array and fill out objData
-  gameState.objectsArr.push(orangeBall)
-  gameState.objData[orangeBall.name] = {scoreVal: 50, airEff: 1, unlockAt: 0}
-  gameState.objectsArr.push(ball2)
-  gameState.objData[ball2.name] = {scoreVal: 100, airEff: 2, unlockAt: 200}
-  gameState.objectsArr.push(redSquare)
-  gameState.objData[redSquare.name] = {scoreVal: 150, airEff: 0.8, unlockAt: 350}
+  gameState.objectsArr.push(orangeBall);
+  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, unlockAt: 0, homeX: 850, homeY: 180 };
+  gameState.objectsArr.push(ball2);
+  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, unlockAt: 200, homeX: 850, homeY: 300 };
+  gameState.objectsArr.push(redSquare);
+  gameState.objData[redSquare.name] = {
+    scoreVal: 150,
+    airEff: 0.8,
+    unlockAt: 350,
+    homeX: 850,
+    homeY: 400
+  };
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
-    hoops.hoopState[gameObj.name] = ['empty' , 'empty']
-  })
+    hoops.hoopState[gameObj.name] = ["empty", "empty"];
+  });
 
   //setup start button
   startButton = this.add
@@ -171,20 +182,22 @@ function create() {
         jetPressure(this, 1);
         jetPressure(this, 2);
         hoops.passCount = 0;
-        scoreDisplay.text = 'Score: ' + hoops.passCount
+        scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
       }
     });
   startButton.setScale(0.09).setSize(200, 200);
 }
-
+//---------------------------------------------------------------------------------------------
 //update function, runs repeatedly while phaser is loaded
 function update() {
   gameState.objectsArr.forEach((gameObj) => {
-    if(gameObj.x > 800 && !gameObj.isStatic()){
-      gameObj.setStatic(true)
+    if (gameObj.x > 800 && !gameObj.isStatic()) {
+      gameObj.setStatic(true);
+      gameObj.x = gameState.objData[gameObj.name].homeX
+      gameObj.y = gameState.objData[gameObj.name].homeY
     }
-  })
+  });
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
@@ -205,7 +218,7 @@ function update() {
     ) {
       //loop through the floatable objects to find out which one(s) are in the airflow
       gameState.objectsArr.forEach((floatObj) => {
-        if(this.matter.overlap(gameObj, floatObj)){
+        if (this.matter.overlap(gameObj, floatObj)) {
           //apply force to objects in airflow based on location in airflow using airflow object's local coordinate system
           //force matching angle of airflow first, doesn't get applied all the way to the end
           if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8) {
@@ -230,7 +243,7 @@ function update() {
             );
           }
         }
-      })
+      });
       //find hoops
     } else if (gameObj.name.startsWith("hoop")) {
       //determine which hoop has been found
@@ -248,37 +261,43 @@ function update() {
           //set state to empty regardless
           if (
             hoops.hoopState[scoreObj.name][hoopPos] === "enteredRight" &&
-            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x <
-              gameObj.width / 2
+            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x < gameObj.width / 2
           ) {
             hoops.passCount += gameState.objData[scoreObj.name].scoreVal;
-            scoreDisplay.text = 'Score: ' + hoops.passCount
-            if(hoops.passCount > gameState.highScore){
-              gameState.highScore = hoops.passCount
-              highDisplay.text = 'High Score: ' + gameState.highScore
+            scoreDisplay.text = "Score: " + hoops.passCount;
+            if (hoops.passCount > gameState.highScore) {
+              gameState.highScore = hoops.passCount;
+              highDisplay.text = "High Score: " + gameState.highScore;
               //determine if the increase in high score has unlocked any objects
               gameState.objectsArr.forEach((unlockObj) => {
-                if(unlockObj.isTinted && gameState.objData[unlockObj.name].unlockAt <= gameState.highScore){
-                  unlockObj.clearTint()
+                if (
+                  unlockObj.isTinted &&
+                  gameState.objData[unlockObj.name].unlockAt <=
+                    gameState.highScore
+                ) {
+                  unlockObj.clearTint();
                 }
-              })
+              });
             }
           } else if (
             hoops.hoopState[scoreObj.name][hoopPos] === "enteredLeft" &&
-            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x >
-              gameObj.width / 2
+            gameObj.getLocalPoint(scoreObj.x, scoreObj.y).x > gameObj.width / 2
           ) {
             hoops.passCount += gameState.objData[scoreObj.name].scoreVal;
-            scoreDisplay.text = 'Score: ' + hoops.passCount
-            if(hoops.passCount > gameState.highScore){
-              gameState.highScore = hoops.passCount
-              highDisplay.text = 'High Score: ' + gameState.highScore
+            scoreDisplay.text = "Score: " + hoops.passCount;
+            if (hoops.passCount > gameState.highScore) {
+              gameState.highScore = hoops.passCount;
+              highDisplay.text = "High Score: " + gameState.highScore;
               //determine if the increase in high score has unlocked any objects
               gameState.objectsArr.forEach((unlockObj) => {
-                if(unlockObj.isTinted && gameState.objData[unlockObj.name].unlockAt <= gameState.highScore){
-                  unlockObj.clearTint()
+                if (
+                  unlockObj.isTinted &&
+                  gameState.objData[unlockObj.name].unlockAt <=
+                    gameState.highScore
+                ) {
+                  unlockObj.clearTint();
                 }
-              })
+              });
             }
           }
           hoops.hoopState[scoreObj.name][hoopPos] = "empty";
@@ -305,7 +324,7 @@ function update() {
         ) {
           hoops.hoopState[scoreObj.name][hoopPos] = "drag";
         }
-      })
+      });
     }
   });
 }
@@ -346,7 +365,7 @@ function createJet(scene, xPos, jetPos) {
         }
       }
     });
-    //create the base object and make it clickable
+  //create the base object and make it clickable
   let base = scene.add
     .image(xPos, 500, "base")
     .setDepth(1)
@@ -360,7 +379,7 @@ function createJet(scene, xPos, jetPos) {
         jetPressure(scene, 2);
       }
     });
-  return [jet, air, base,];
+  return [jet, air, base];
 }
 
 //update pressure of jet
