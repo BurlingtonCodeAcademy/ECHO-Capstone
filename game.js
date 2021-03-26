@@ -31,6 +31,10 @@ function preload() {
   this.load.image("base", "assets/base.png");
   this.load.image("button", "assets/button.png");
 
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"])
+  this.load.audio("airFlow", ["assets/sfx/airflow.mp3"])
+  //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
+
   this.load.image("hoop", "assets/hoop.png");
   this.load.image("hoopFront", "assets/hoopFront.png");
 
@@ -350,3 +354,14 @@ function createHoop(scene, xPos, yPos, hoopPos) {
   });
   return [hoop, hoopFront, hoopTop, hoopBottom];
 }
+
+//work in progress
+// function createSound() {
+//     this.ballBounce = this.add.audio("ballBounce")
+//     this.airFlow = this.add.audio("airFlow")
+
+//     if(gameObject.collides){
+//         this.ballBounce.play();
+
+//     }
+// }
