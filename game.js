@@ -161,14 +161,15 @@ function create() {
 
   //add floatable objects to gameState's array and fill out objData
   gameState.objectsArr.push(orangeBall);
-  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, unlockAt: 0, homeX: 850, homeY: 180 };
+  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, flowPenalty: 0, unlockAt: 0, homeX: 850, homeY: 180 };
   gameState.objectsArr.push(ball2);
-  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, unlockAt: 200, homeX: 850, homeY: 300 };
+  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, flowPenalty: 4, unlockAt: 0, homeX: 850, homeY: 300 };
   gameState.objectsArr.push(redSquare);
   gameState.objData[redSquare.name] = {
     scoreVal: 150,
-    airEff: 0.8,
-    unlockAt: 350,
+    airEff: 0.4,
+    flowPenalty: 8,
+    unlockAt: 0,
     homeX: 850,
     homeY: 400
   };
@@ -234,7 +235,7 @@ function update() {
         if (this.matter.overlap(gameObj, floatObj)) {
           //apply force to objects in airflow based on location in airflow using airflow object's local coordinate system
           //force matching angle of airflow first, doesn't get applied all the way to the end
-          if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8) {
+          if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8 + gameState.objData[floatObj.name].flowPenalty) {
             this.matter.applyForceFromAngle(
               floatObj,
               0.0025 * gameState.objData[floatObj.name].airEff,
