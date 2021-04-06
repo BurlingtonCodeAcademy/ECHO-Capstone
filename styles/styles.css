@@ -9,6 +9,15 @@ h1 {
     display: flex;
     justify-content: center;
     
+    
+}
+
+#button {
+    background-image: url(./assets/game.png);
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* .game {
