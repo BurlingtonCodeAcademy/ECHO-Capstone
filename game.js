@@ -31,8 +31,9 @@ function preload() {
   this.load.image("button", "assets/button.png");
   this.load.image("sidebar", "assets/sidebar2.png");
 
-  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
-  this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
+  // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
+  this.load.audio("StrongAir", ['assets/sfx/StrongAir.mp3']) //loads in sound asset
   //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
 
   this.load.image("square", "assets/redSquare.png");
@@ -193,6 +194,10 @@ function create() {
     hoops.hoopState[gameObj.name] = ["empty", "empty"];
   });
 
+  //--------------------------------------------Sound for the air--------------------------------//
+  let jetFX = this.sound.add('StrongAir');
+  // music.play()
+
   //setup start button
   startButton = this.add
     .image(750, 650, "button")
@@ -203,6 +208,7 @@ function create() {
       //otherwise start the game, turn on the jets, reset the score and set the time when the game will end
       if (!gameState.running) {
         gameState.running = true;
+        jetFX.play()
         jets.enabled[0] = true;
         jets.enabled[1] = true;
         jets.enabled[2] = true;
@@ -230,6 +236,7 @@ function update() {
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
     gameState.running = false;
+    this.sound.get("StrongAir").stop()//stops the air sound effects
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
@@ -466,14 +473,14 @@ function createHoop(scene, xPos, yPos, hoopPos) {
 }
 
 //create sound effects, still work in progress
-function createSound() {
-  this.ballBounce = this.add.audio("ballBounce");
-  this.airFlow = this.add.audio("airFlow");
+// function createSound() {
+//   this.ballBounce = this.add.audio("ballBounce");
+//   this.airFlow = this.add.audio("airFlow");
 
-  if (gameObject.collides) {
-    this.ballBounce.play();
-  }
-  if (jets.enabled) {
-    this.airFlow.play(loop); //
-  }
-}
+//   if (gameObject.collides) {
+//     this.ballBounce.play();
+//   }
+//   if (jets.enabled) {
+//     this.airFlow.play(loop); //
+//   }
+// }
