@@ -1,6 +1,3 @@
-// start button attribution <a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
-
-
 //setup phaser
 const config = {
   type: Phaser.AUTO,
@@ -462,3 +459,4 @@ function createSound() {
     this.airFlow.play(loop); //
   }
 }
+
