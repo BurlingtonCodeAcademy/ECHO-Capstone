@@ -18,14 +18,17 @@ const config = {
 
 const game = new Phaser.Game(config);
 
+const widthScale = 800 / config.width
+const heightScale = 600 / (config.height - 100)
+
 //load assets and plugins
 function preload() {
-  this.load.image("background", "assets/background.png");
-  this.load.image("ground", "assets/ground.png");
-  this.load.image("jet", "assets/jet.png");
-  this.load.image("ball", "assets/orangeBall.png");
-  this.load.image("airflow", "assets/airflow.png");
-  this.load.image("base", "assets/base.png");
+  this.load.image("background", "assets/images/newbackground.png");
+  // this.load.image("ground", "assets/ground.png");
+  this.load.image("jet", "assets/images/tube.png");
+  this.load.image("ball", "assets/images/newball.png");
+  this.load.image("airflow", "assets/images/air.png");
+  this.load.image("base", "assets/images/tube-base.png");
   this.load.image("button", "assets/button.png");
   this.load.image("sidebar", "assets/sidebar2.png");
 
@@ -35,9 +38,10 @@ function preload() {
   //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
 
   this.load.image("square", "assets/redSquare.png");
-  this.load.image("hoop", "assets/hoop.png");
-  this.load.image("hoopFront", "assets/hoopFront.png");
-  
+  this.load.image("hoop0", "assets/images/tall-hoop.png");
+  this.load.image("hoop1", "assets/images/short-hoop.png")
+  this.load.image("hoopFront", "assets/images/hoop-half.png");
+  this.load.image('hoopOld', "assets/hoop.png")
 
   this.load.plugin(
     "rexdragrotateplugin",
@@ -76,11 +80,11 @@ let gameState = {
 //create function, phaser calls it once when setting up
 function create() {
   //create background, ground, set world bounds, and display score and high score
-  this.add.image(400, 300, "background").setDepth(-5);
+  let background = this.add.image(400, 300, "background").setDepth(-5);
+  background.scaleY = (config.height - 100) * heightScale / background.height
+  background.scaleX = config.width * widthScale / background.width
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
-  ground = this.matter.add
-    .image(400, 550, "ground", null, { isStatic: true })
-    .setDepth(1);
+  ground = this.matter.add.rectangle(400, 505, 800, 3, {isStatic: true})
   scoreDisplay = this.add
     .text(40, 530, "Score: " + hoops.passCount)
     .setDepth(2);
@@ -93,8 +97,8 @@ function create() {
   createJet(this, 130, 0);
   createJet(this, 400, 1);
   createJet(this, 670, 2);
-  createHoop(this, 265, 175, 0);
-  createHoop(this, 535, 225, 1);
+  createHoop(this, 265, 328, 0);//175
+  createHoop(this, 535, 355, 1);//225
 
   //create floatable objects
   orangeBall = this.matter.add.image(80, 650, "ball", null, {
@@ -102,7 +106,7 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
-  orangeBall.setInteractive();
+  orangeBall.setInteractive().setScale(30 * widthScale / orangeBall.width);
   orangeBall.name = "ballA";
   //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
@@ -111,7 +115,7 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
-  ball2.setInteractive().setScale(2);
+  ball2.setInteractive().setScale(30 * widthScale / orangeBall.width * 2);
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
@@ -148,16 +152,16 @@ function create() {
     gameObject.setStatic(false);
 
     //while the game is running, apply a score penalty for dragging objects
-    if (gameState.running) {
-      hoops.passCount -= Math.floor(
-        gameState.objData[gameObject.name].scoreVal * 0.4
-      );
-      scoreDisplay.text = "Score: " + hoops.passCount;
-    }
+    // if (gameState.running) {
+    //   hoops.passCount -= Math.floor(
+    //     gameState.objData[gameObject.name].scoreVal * 0.4
+    //   );
+    //   scoreDisplay.text = "Score: " + hoops.passCount;
+    // }
   });
-  this.input.on("dragend", (pointer, gameObject) => {
-    gameObject.setStatic(false);
-  });
+  // this.input.on("dragend", (pointer, gameObject) => {
+  //   gameObject.setStatic(false);
+  // });
 
   //add floatable objects to gameState's array and fill out objData
   gameState.objectsArr.push(orangeBall);
@@ -246,6 +250,7 @@ function update() {
   //loop through all game objects in scene
   this.children.getChildren().forEach((gameObj) => {
     //first find airflow objects that overlap with any floatable object
+    //console.log(gameObj.name)
     if (
       gameObj.name.startsWith("air") &&
       this.matter.overlap(gameObj, gameState.objectsArr)
@@ -374,12 +379,12 @@ function createJet(scene, xPos, jetPos) {
     .setDepth(-1)
     .setCollisionCategory(null);
   air.name = "air" + jetPos;
-  air.scaleY = 1;
+  air.setScale(30 * widthScale / air.width)
   // air.setVisible(false)
   //create jet object and name it
   let jet = scene.matter.add
-    .image(xPos, 500, "jet", null, { isStatic: true })
-    .setScale(1.1);
+    .image(xPos, 500, "jet", null, { isStatic: true });
+  jet.setScale(30 * widthScale / jet.width * 1.1)
   jet.name = "jet" + jetPos;
   //use drag rotate plugin to make jet controllable
   scene.plugins
@@ -416,6 +421,7 @@ function createJet(scene, xPos, jetPos) {
         jetPressure(scene, 2);
       }
     });
+  base.setScale(60 * widthScale / base.width)
   return [jet, air, base];
 }
 
@@ -428,7 +434,7 @@ function jetPressure(scene, jetPos) {
         //briefly set rotation of air to 0 to prevent weird warping of hitbox when adjusting scale
         let currRotate = gameObj.rotation;
         gameObj.rotation = 0;
-        gameObj.scaleY = 1;
+        gameObj.scaleY = 30 * widthScale / gameObj.width;
         gameObj.rotation = currRotate;
       }
     });
@@ -445,7 +451,7 @@ function jetPressure(scene, jetPos) {
       if (gameObj.name === "air" + jetPos) {
         let currRotate = gameObj.rotation;
         gameObj.rotation = 0;
-        gameObj.scaleY = 1 + jets.totalPressure / enabledJets;
+        gameObj.scaleY = (1 + jets.totalPressure / enabledJets) * 30 * widthScale / gameObj.width;
         gameObj.rotation = currRotate;
       }
     });
@@ -454,21 +460,25 @@ function jetPressure(scene, jetPos) {
 
 //create hoop
 function createHoop(scene, xPos, yPos, hoopPos) {
-  //create primary hoop object, remove collision and name it
-  let hoop = scene.matter.add
-    .image(xPos, yPos, "hoop", null, { isStatic: true })
-    .setCollisionCategory(null);
-  hoop.name = "hoop" + hoopPos;
+  //create hoop image
+  let hoop = scene.add
+    .image(xPos, yPos, "hoop" + hoopPos)
+  hoop.setScale(60 * widthScale / hoop.width)
   //create half hoop object that renders on top of floatable objects
-  let hoopFront = scene.add.image(xPos - 16, yPos, "hoopFront").setDepth(5);
+  let hoopFront = scene.add.image(xPos - 15, yPos - 115 + (hoopPos * 23), "hoopFront").setDepth(5);
+  hoopFront.setScale(60 * widthScale / hoop.width)
+  //create hitbox for hoop and name it
+  let hoopDetector = scene.matter.add.image(xPos, yPos - 115 + (hoopPos * 23), "hoopOld", null,  {isStatic: true})
+  hoopDetector.name = "hoop" + hoopPos
+  hoopDetector.setVisible(false).setCollisionCategory(null)
   //create small invisible boxes with collision for the top and bottom of the hoop
-  let hoopTop = scene.matter.add.rectangle(xPos, yPos - 54, 12, 8, {
+  let hoopTop = scene.matter.add.rectangle(xPos, yPos - 166 + (hoopPos * 23), 12, 15, {
     isStatic: true,
   });
-  let hoopBottom = scene.matter.add.rectangle(xPos, yPos + 54, 12, 8, {
+  let hoopBottom = scene.matter.add.rectangle(xPos, yPos + 55 - hoopPos, 12, 240 - (hoopPos * 52), {
     isStatic: true,
   });
-  return [hoop, hoopFront, hoopTop, hoopBottom];
+  return [hoop, hoopFront, hoopTop, hoopBottom, hoopDetector];
 }
 
 //create sound effects, still work in progress
