@@ -20,8 +20,8 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-const widthScale = 800 / (config.width - 100)
-const heightScale = 600 / config.height
+const widthScale = 800 / config.width
+const heightScale = 600 / (config.height - 100)
 
 //load assets and plugins
 function preload() {
@@ -83,8 +83,8 @@ let gameState = {
 function create() {
   //create background, ground, set world bounds, and display score and high score
   let background = this.add.image(400, 300, "background").setDepth(-5);
-  background.scaleY = config.height * heightScale / background.height
-  background.scaleX = (config.width - 100) * widthScale / background.width
+  background.scaleY = (config.height - 100) * heightScale / background.height
+  background.scaleX = config.width * widthScale / background.width
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
   ground = this.matter.add.rectangle(400, 505, 800, 3, {isStatic: true})
   scoreDisplay = this.add
