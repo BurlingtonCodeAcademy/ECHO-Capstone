@@ -1,8 +1,8 @@
 //setup phaser
 const config = {
   type: Phaser.AUTO,
-  width: 900,
-  height: 600,
+  width: 800,
+  height: 700,
   physics: {
     default: "matter",
     matter: {
@@ -29,8 +29,9 @@ function preload() {
   this.load.image("button", "assets/button.png");
   this.load.image("sidebar", "assets/sidebar2.png");
 
-  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
-  this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
+  // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
+  this.load.audio("StrongAir", ['assets/sfx/StrongAir.mp3']) //loads in sound asset
   //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
 
   this.load.image("square", "assets/redSquare.png");
@@ -96,7 +97,7 @@ function create() {
   createHoop(this, 535, 225, 1);
 
   //create floatable objects
-  orangeBall = this.matter.add.image(850, 180 , "ball", null, {
+  orangeBall = this.matter.add.image(80, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -105,7 +106,7 @@ function create() {
   orangeBall.name = "ballA";
   //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
-  ball2 = this.matter.add.image(850, 230, "ball", null, {
+  ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -114,7 +115,7 @@ function create() {
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
-  redSquare = this.matter.add.image(850, 280, "square", null, {
+  redSquare = this.matter.add.image(250, 650, "square", null, {
     friction: 0.7,
     restitution: 0.3,
   });
@@ -160,17 +161,31 @@ function create() {
 
   //add floatable objects to gameState's array and fill out objData
   gameState.objectsArr.push(orangeBall);
-  gameState.objData[orangeBall.name] = { scoreVal: 50, airEff: 1, flowPenalty: 0, unlockAt: 0, homeX: 850, homeY: 180 };
+  gameState.objData[orangeBall.name] = {
+    scoreVal: 50,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 80,
+    homeY: 650,
+  };
   gameState.objectsArr.push(ball2);
-  gameState.objData[ball2.name] = { scoreVal: 100, airEff: 2, flowPenalty: 4, unlockAt: 0, homeX: 850, homeY: 300 };
+  gameState.objData[ball2.name] = {
+    scoreVal: 100,
+    airEff: 2,
+    flowPenalty: 4,
+    unlockAt: 0,
+    homeX: 100,
+    homeY: 650,
+  };
   gameState.objectsArr.push(redSquare);
   gameState.objData[redSquare.name] = {
     scoreVal: 150,
     airEff: 0.4,
     flowPenalty: 8,
     unlockAt: 0,
-    homeX: 850,
-    homeY: 400
+    homeX: 250,
+    homeY: 650,
   };
 
   //use gameState's array to populate hoopState
@@ -178,9 +193,13 @@ function create() {
     hoops.hoopState[gameObj.name] = ["empty", "empty"];
   });
 
+  //--------------------------------------------Sound for the air--------------------------------//
+  let jetFX = this.sound.add('StrongAir');
+  // music.play()
+
   //setup start button
   startButton = this.add
-    .image(850, 30, "button")
+    .image(750, 650, "button")
     .setInteractive()
     .on("pointerdown", () => {
       //when clicking the start button,
@@ -188,6 +207,7 @@ function create() {
       //otherwise start the game, turn on the jets, reset the score and set the time when the game will end
       if (!gameState.running) {
         gameState.running = true;
+        jetFX.play()
         jets.enabled[0] = true;
         jets.enabled[1] = true;
         jets.enabled[2] = true;
@@ -205,16 +225,17 @@ function create() {
 //update function, runs repeatedly while phaser is loaded
 function update() {
   gameState.objectsArr.forEach((gameObj) => {
-    if (gameObj.x > 800 && !gameObj.isStatic()) {
+    if (gameObj.y > 600 && !gameObj.isStatic()) {
       gameObj.setStatic(true);
-      gameObj.x = gameState.objData[gameObj.name].homeX
-      gameObj.y = gameState.objData[gameObj.name].homeY
+      gameObj.x = gameState.objData[gameObj.name].homeX;
+      gameObj.y = gameState.objData[gameObj.name].homeY;
     }
   });
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
     gameState.running = false;
+    this.sound.get("StrongAir").stop()//stops the air sound effects
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
@@ -234,7 +255,10 @@ function update() {
         if (this.matter.overlap(gameObj, floatObj)) {
           //apply force to objects in airflow based on location in airflow using airflow object's local coordinate system
           //force matching angle of airflow first, doesn't get applied all the way to the end
-          if (gameObj.getLocalPoint(floatObj.x, floatObj.y).y > 8 + gameState.objData[floatObj.name].flowPenalty) {
+          if (
+            gameObj.getLocalPoint(floatObj.x, floatObj.y).y >
+            8 + gameState.objData[floatObj.name].flowPenalty
+          ) {
             this.matter.applyForceFromAngle(
               floatObj,
               0.0025 * gameState.objData[floatObj.name].airEff,
@@ -448,15 +472,14 @@ function createHoop(scene, xPos, yPos, hoopPos) {
 }
 
 //create sound effects, still work in progress
-function createSound() {
-  this.ballBounce = this.add.audio("ballBounce");
-  this.airFlow = this.add.audio("airFlow");
+// function createSound() {
+//   this.ballBounce = this.add.audio("ballBounce");
+//   this.airFlow = this.add.audio("airFlow");
 
-  if (gameObject.collides) {
-    this.ballBounce.play();
-  }
-  if (jets.enabled) {
-    this.airFlow.play(loop); //
-  }
-}
-
+//   if (gameObject.collides) {
+//     this.ballBounce.play();
+//   }
+//   if (jets.enabled) {
+//     this.airFlow.play(loop); //
+//   }
+// }
