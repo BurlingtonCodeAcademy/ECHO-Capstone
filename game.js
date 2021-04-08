@@ -39,6 +39,7 @@ function preload() {
   this.load.image("hoop1", "assets/images/short-hoop.png");
   this.load.image("hoopFront", "assets/images/hoop-half.png");
   this.load.image("hoopOld", "assets/hoop.png");
+  this.load.image('bubble', 'assets/images/bubble.png')
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -57,6 +58,9 @@ let ground;
 let orangeBall;
 let ball2;
 let redSquare;
+let bubbleL;
+let bubbleM;
+let bubbleS;
 let scoreDisplay;
 let highDisplay;
 
@@ -101,15 +105,15 @@ function create() {
   createHoop(this, 535, 355, 1); //225
 
   //create floatable objects
-  orangeBall = this.matter.add.image(50, 650, "ball", null, {
+  orangeBall = this.matter.add.image(40, 600, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
   orangeBall.setInteractive().setScale((30 * widthScale) / orangeBall.width);
   orangeBall.name = "ballA";
-  //orangeBall.setStatic(true)
   this.input.setDraggable(orangeBall);
+
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
@@ -119,7 +123,8 @@ function create() {
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
-  redSquare = this.matter.add.image(150, 650, "square", null, {
+
+  redSquare = this.matter.add.image(170, 600, "square", null, {
     friction: 0.7,
     restitution: 0.3,
   });
@@ -127,6 +132,24 @@ function create() {
   redSquare.name = "squareA";
   redSquare.tint = 0x808080;
   this.input.setDraggable(redSquare);
+
+  bubbleL = this.matter.add.image(215, 650, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
+  bubbleL.setInteractive().setScale(40 * widthScale / bubbleL.width)
+  bubbleL.name = 'bubbleLarge'
+  bubbleL.tint = 0x808080
+  this.input.setDraggable(bubbleL)
+
+  bubbleM = this.matter.add.image(245, 635, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
+  bubbleM.setInteractive().setScale(25 * widthScale / bubbleM.width)
+  bubbleM.name = 'bubbleMedium'
+  bubbleM.tint = 0x808080
+  this.input.setDraggable(bubbleM)
+
+  bubbleS = this.matter.add.image(227, 620, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
+  bubbleS.setInteractive().setScale(17 * widthScale / bubbleS.width)
+  bubbleS.name = 'bubbleSmall'
+  bubbleS.tint = 0x808080
+  this.input.setDraggable(bubbleS)
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
@@ -159,8 +182,8 @@ function create() {
     airEff: 1,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 50,
-    homeY: 650,
+    homeX: 40,
+    homeY: 600,
   };
   gameState.objectsArr.push(ball2);
   gameState.objData[ball2.name] = {
@@ -177,9 +200,36 @@ function create() {
     airEff: 0.4,
     flowPenalty: 8,
     unlockAt: 0,
-    homeX: 150,
-    homeY: 650,
+    homeX: 170,
+    homeY: 600,
   };
+  gameState.objectsArr.push(bubbleL)
+  gameState.objData[bubbleL.name] = {
+    scoreVal: 250,
+    airEff: 5,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 215,
+    homeY: 650
+  }
+  gameState.objectsArr.push(bubbleM)
+  gameState.objData[bubbleM.name] = {
+    scoreVal: 250,
+    airEff: 3,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 245,
+    homeY: 635
+  }
+  gameState.objectsArr.push(bubbleS)
+  gameState.objData[bubbleS.name] = {
+    scoreVal: 250,
+    airEff: 1.5,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 227,
+    homeY: 620
+  }
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
