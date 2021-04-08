@@ -194,7 +194,7 @@ function create() {
 
   //--------------------------------------------Sound for the air--------------------------------//
   let jetFX = this.sound.add("StrongAir");
-
+  jetFX.setMute(true);
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
   startButton = this.add
@@ -208,7 +208,7 @@ function create() {
         gameState.running = true;
         startButton.setDepth(-1);
         jetFX.play();
-        jetFX.setMute(true);
+        
         jets.enabled[0] = true;
         jets.enabled[1] = true;
         jets.enabled[2] = true;
