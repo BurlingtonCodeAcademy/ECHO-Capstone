@@ -39,7 +39,7 @@ function preload() {
   this.load.image("hoopOld", "assets/images/hoop.png");
   this.load.image("speakerIcon", "assets/images/speaker.png");
   this.load.image("mutedIcon", "assets/images/mute.png");
-  this.load.image('bubble', 'assets/images/bubble.png')
+  this.load.image("bubble", "assets/images/bubble.png");
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -135,23 +135,77 @@ function create() {
   redSquare.tint = 0x808080;
   this.input.setDraggable(redSquare);
 
-  bubbleL = this.matter.add.image(215, 650, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
-  bubbleL.setInteractive().setScale(40 * widthScale / bubbleL.width)
-  bubbleL.name = 'bubbleLarge'
-  bubbleL.tint = 0x808080
-  this.input.setDraggable(bubbleL)
+  bubbleL = this.matter.add.image(215, 650, "bubble", null, {
+    shape: "circle",
+    frictionAir: 0.12,
+    density: 0.0007,
+  });
+  bubbleL
+    .setInteractive()
+    .setScale((40 * widthScale) / bubbleL.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        bubbleL.setStatic(true);
+        bubbleL.x = gameState.objData[bubbleL.name].homeX;
+        bubbleL.y = gameState.objData[bubbleL.name].homeY;
+        hoops.hoopState[bubbleL.name][0] = "empty";
+        hoops.hoopState[bubbleL.name][1] = "empty";
+      }
+    });
+  bubbleL.name = "bubbleLarge";
+  bubbleL.tint = 0x808080;
+  this.input.setDraggable(bubbleL);
 
-  bubbleM = this.matter.add.image(245, 635, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
-  bubbleM.setInteractive().setScale(25 * widthScale / bubbleM.width)
-  bubbleM.name = 'bubbleMedium'
-  bubbleM.tint = 0x808080
-  this.input.setDraggable(bubbleM)
+  bubbleM = this.matter.add.image(245, 635, "bubble", null, {
+    shape: "circle",
+    frictionAir: 0.12,
+    density: 0.0007,
+  });
+  bubbleM
+    .setInteractive()
+    .setScale((25 * widthScale) / bubbleM.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        bubbleM.setStatic(true);
+        bubbleM.x = gameState.objData[bubbleM.name].homeX;
+        bubbleM.y = gameState.objData[bubbleM.name].homeY;
+        hoops.hoopState[bubbleM.name][0] = "empty";
+        hoops.hoopState[bubbleM.name][1] = "empty";
+      }
+    });
+  bubbleM.name = "bubbleMedium";
+  bubbleM.tint = 0x808080;
+  this.input.setDraggable(bubbleM);
 
-  bubbleS = this.matter.add.image(227, 620, 'bubble', null, {shape: 'circle', frictionAir: .12, density: .0007})
-  bubbleS.setInteractive().setScale(17 * widthScale / bubbleS.width)
-  bubbleS.name = 'bubbleSmall'
-  bubbleS.tint = 0x808080
-  this.input.setDraggable(bubbleS)
+  bubbleS = this.matter.add.image(227, 620, "bubble", null, {
+    shape: "circle",
+    frictionAir: 0.12,
+    density: 0.0007,
+  });
+  bubbleS
+    .setInteractive()
+    .setScale((17 * widthScale) / bubbleS.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        bubbleS.setStatic(true);
+        bubbleS.x = gameState.objData[bubbleS.name].homeX;
+        bubbleS.y = gameState.objData[bubbleS.name].homeY;
+        hoops.hoopState[bubbleS.name][0] = "empty";
+        hoops.hoopState[bubbleS.name][1] = "empty";
+      }
+    });
+  bubbleS.name = "bubbleSmall";
+  bubbleS.tint = 0x808080;
+  this.input.setDraggable(bubbleS);
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
@@ -205,33 +259,33 @@ function create() {
     homeX: 170,
     homeY: 600,
   };
-  gameState.objectsArr.push(bubbleL)
+  gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
     scoreVal: 250,
     airEff: 5,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 215,
-    homeY: 650
-  }
-  gameState.objectsArr.push(bubbleM)
+    homeY: 650,
+  };
+  gameState.objectsArr.push(bubbleM);
   gameState.objData[bubbleM.name] = {
     scoreVal: 250,
     airEff: 3,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 245,
-    homeY: 635
-  }
-  gameState.objectsArr.push(bubbleS)
+    homeY: 635,
+  };
+  gameState.objectsArr.push(bubbleS);
   gameState.objData[bubbleS.name] = {
     scoreVal: 250,
     airEff: 1.5,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 227,
-    homeY: 620
-  }
+    homeY: 620,
+  };
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -239,7 +293,7 @@ function create() {
   });
 
   //--------------------------------------------Sound for the air--------------------------------//
-  let jetFX = this.sound.add("StrongAir", {volume: .35});
+  let jetFX = this.sound.add("StrongAir", { volume: 0.35 });
   jetFX.setMute(true);
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
@@ -269,7 +323,7 @@ function create() {
   this.add
     .image(750, 650, "buttonDisabled")
     .setScale((80 * heightScale) / startButton.height);
-//button to toggle muting, starts muted then toggles sound on. Might pull out and make own function
+  //button to toggle muting, starts muted then toggles sound on. Might pull out and make own function
   speakerIcon = this.add
     .image(50, 40, "speakerIcon")
     .setInteractive()
@@ -306,6 +360,7 @@ function update() {
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
+    // console.log('X: ' + orangeBall.body.velocity.x + ', Y: ' + orangeBall.body.velocity.y)
     gameState.running = false;
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
