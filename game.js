@@ -1,4 +1,6 @@
 // start button y<a href='https://pngtree.com/so/play'>play png from pngtree.com</a>
+//<div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> //attribute for mute icon
+//<div>Icons made by <a href="https://www.flaticon.com/authors/becris" title="Becris">Becris</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> //attribute for speaker icon
 
 //setup phaser
 const config = {
@@ -33,12 +35,14 @@ function preload() {
   this.load.image("base", "assets/images/tube-base.png");
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
-  this.load.image("sidebar", "assets/sidebar2.png");
-  this.load.image("square", "assets/redSquare.png");
+  this.load.image("sidebar", "assets/images/sidebar2.png");
+  this.load.image("square", "assets/images/redSquare.png");
   this.load.image("hoop0", "assets/images/tall-hoop.png");
   this.load.image("hoop1", "assets/images/short-hoop.png");
   this.load.image("hoopFront", "assets/images/hoop-half.png");
-  this.load.image("hoopOld", "assets/hoop.png");
+  this.load.image("hoopOld", "assets/images/hoop.png");
+  this.load.image("speakerIcon", "assets/images/speaker.png");
+  this.load.image("mutedIcon", "assets/images/mute.png");
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -59,6 +63,8 @@ let ball2;
 let redSquare;
 let scoreDisplay;
 let highDisplay;
+let speakerIcon;
+let mutedIcon;
 
 //state trackers
 let jets = {
@@ -188,8 +194,8 @@ function create() {
 
   //--------------------------------------------Sound for the air--------------------------------//
   let jetFX = this.sound.add("StrongAir");
-  // music.play()
 
+  //--------------------------------------------buttons------------------------------------------//
   //setup start button
   startButton = this.add
     .image(750, 650, "button")
@@ -202,6 +208,7 @@ function create() {
         gameState.running = true;
         startButton.setDepth(-1);
         jetFX.play();
+        jetFX.setMute(true);
         jets.enabled[0] = true;
         jets.enabled[1] = true;
         jets.enabled[2] = true;
@@ -217,6 +224,29 @@ function create() {
   this.add
     .image(750, 650, "buttonDisabled")
     .setScale((80 * heightScale) / startButton.height);
+//button to toggle muting, starts muted then toggles sound on. Might pull out and make own function
+  speakerIcon = this.add
+    .image(50, 40, "speakerIcon")
+    .setInteractive()
+    .on("pointerdown", () => {
+      if (jetFX.setMute(false)) {
+        jetFX.setMute(true);
+        speakerIcon.setDepth(-6);
+        mutedIcon.setDepth(1);
+      }
+    });
+  speakerIcon.setScale(0.06).setDepth(-6);
+  mutedIcon = this.add
+    .image(50, 40, "mutedIcon")
+    .setInteractive()
+    .on("pointerdown", () => {
+      if (jetFX.setMute(true)) {
+        jetFX.setMute(false);
+        mutedIcon.setDepth(-6);
+        speakerIcon.setDepth(1);
+      }
+    });
+  mutedIcon.setScale(0.05).setDepth(1);
 }
 //---------------------------------------------------------------------------------------------
 //update function, runs repeatedly while phaser is loaded
