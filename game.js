@@ -41,9 +41,7 @@ function preload() {
   this.load.image("mutedIcon", "assets/images/mute.png");
   this.load.image("bubble", "assets/images/bubble.png");
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
-  // this.load.audio("airFlow", ["assets/sfx/airflow.mp3"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
-  //airflow is only like a second long but i think we can manipulate the intensity in loudness and probably loop it
   this.load.plugin(
     "rexdragrotateplugin",
     "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js",
