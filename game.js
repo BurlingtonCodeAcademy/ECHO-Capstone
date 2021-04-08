@@ -61,6 +61,7 @@ let bubbleM;
 let bubbleS;
 let scoreDisplay;
 let highDisplay;
+let timeDisplay;
 let speakerIcon;
 let mutedIcon;
 
@@ -95,7 +96,10 @@ function create() {
   highDisplay = this.add
     .text(30, 550, "High Score: " + gameState.highScore)
     .setDepth(2);
-  this.matter.add.rectangle(801, 300, 3, 600, { isStatic: true });
+  timeDisplay = this.add.line()
+  timeDisplay.setDepth(5)
+  timeDisplay.setStrokeStyle(10, 0xA8FF8B, 1)
+  timeDisplay.setTo(0, 520, 64, 520)
 
   //create jets and hoops
   createJet(this, 130, 0);
@@ -315,6 +319,7 @@ function create() {
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
+        timeDisplay.setTo(0, 520, 864, 520)
       }
     });
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
@@ -355,6 +360,9 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
     }
   });
+  if(gameState.running){
+    timeDisplay.setTo(0, 520, 64 + ((gameState.gameEnd - Date.now()) / 25000 * 800), 520)
+  }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
