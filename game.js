@@ -51,6 +51,7 @@ function preload() {
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
   this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
   this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"])
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
@@ -130,6 +131,11 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
+
   orangeBall
     .setInteractive()
     .setScale((30 * widthScale) / orangeBall.width)
@@ -143,10 +149,6 @@ function create() {
     });
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
-
-  //sound fx for ball bounce
-  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
-  ballFX.setMute(true);
 
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
@@ -256,6 +258,10 @@ function create() {
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
 
+  //sound fx for water drop
+  let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
+  waterFX.setMute(true);
+
   drop = this.matter.add.sprite(270, 600, "drop", 0, { shape: "circle" });
   this.anims.create({
     key: "splash",
@@ -282,6 +288,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        waterFX.play();
         drop.setStatic(true);
         hoops.hoopState[drop.name][0] = "empty";
         hoops.hoopState[drop.name][1] = "empty";
@@ -439,9 +446,10 @@ function create() {
       if (
         jetFX.setMute(false) &&
         bubbleFX.setMute(false) &&
-        ballFX.setMute(false)
+        ballFX.setMute(false) &&
+        waterFX.setMute(false)
       ) {
-        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true);
+        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true) && waterFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -454,11 +462,13 @@ function create() {
       if (
         jetFX.setMute(true) &&
         bubbleFX.setMute(true) &&
-        ballFX.setMute(true)
+        ballFX.setMute(true) &&
+        waterFX.setMute(true)
       ) {
         jetFX.setMute(false) &&
           bubbleFX.setMute(false) &&
-          ballFX.setMute(false);
+          ballFX.setMute(false) &&
+          waterFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -502,6 +512,7 @@ function update() {
     this.sound.get("StrongAir").stop(); //stops the air sound effects
     this.sound.get("BubblePop").stop();
     this.sound.get("ballBounce").stop();
+    this.sound.get("waterDrop").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
