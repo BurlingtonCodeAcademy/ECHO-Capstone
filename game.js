@@ -42,6 +42,10 @@ function preload() {
   this.load.image("speakerIcon", "assets/images/speaker.png");
   this.load.image("mutedIcon", "assets/images/mute.png");
   this.load.image("bubble", "assets/images/bubble.png");
+  this.load.spritesheet("drop", "assets/images/waterAnimation.png", {
+    frameWidth: 170,
+    frameHeight: 75,
+  });
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -65,6 +69,7 @@ let redSquare;
 let bubbleL;
 let bubbleM;
 let bubbleS;
+let drop;
 let scoreDisplay;
 let highDisplay;
 let timeDisplay;
@@ -251,6 +256,48 @@ function create() {
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
 
+  drop = this.matter.add.sprite(270, 600, "drop", 0, { shape: "circle" });
+  this.anims.create({
+    key: "splash",
+    frames: this.anims.generateFrameNumbers("drop", { start: 0, end: 5 }),
+    frameRate: 20,
+    repeat: 0,
+  });
+  this.anims.create({
+    key: "normalDrop",
+    frames: [{ key: "drop", frame: 0 }],
+    frameRate: 20,
+    repeat: -1,
+  });
+  drop
+    .setInteractive()
+    .setScale((30 * heightScale) / drop.height)
+    .setBody({
+      width: 32 * heightScale,
+      height: 32 * heightScale,
+      type: "circle",
+    })
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        drop.setStatic(true);
+        hoops.hoopState[drop.name][0] = "empty";
+        hoops.hoopState[drop.name][1] = "empty";
+        drop.anims.play("splash");
+      }
+    })
+    .on("animationcomplete", () => {
+      drop.x = gameState.objData[drop.name].homeX;
+      drop.y = gameState.objData[drop.name].homeY;
+      drop.rotation = 0;
+      drop.anims.play("normalDrop");
+    });
+  drop.name = "waterDrop";
+  drop.tint = 0x808080;
+  this.input.setDraggable(drop);
+
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
     if (gameState.objData[gameObject.name].unlockAt <= gameState.highScore) {
@@ -329,6 +376,15 @@ function create() {
     unlockAt: 0,
     homeX: 227,
     homeY: 620,
+  };
+  gameState.objectsArr.push(drop);
+  gameState.objData[drop.name] = {
+    scoreVal: 300,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 270,
+    homeY: 600,
   };
 
   //use gameState's array to populate hoopState
@@ -412,6 +468,7 @@ function create() {
 //---------------------------------------------------------------------------------------------
 //update function, runs repeatedly while phaser is loaded
 function update() {
+  //if an object is outside the play area put it at its home location
   gameState.objectsArr.forEach((gameObj) => {
     if (gameObj.y > 500 && !gameObj.isStatic()) {
       gameObj.setStatic(true);
@@ -419,6 +476,7 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
     }
   });
+  //if the game is running, adjust the length of the time display
   if (gameState.running) {
     timeDisplay.setTo(
       0,
@@ -426,6 +484,14 @@ function update() {
       64 + ((gameState.gameEnd - Date.now()) / 25000) * 800,
       520
     );
+  }
+  //if the water drop is not static, adjust its rotation based on its velocity
+  if (
+    !drop.isStatic() &&
+    Math.abs(drop.body.velocity.x) + Math.abs(drop.body.velocity.y) !== 0
+  ) {
+    drop.rotation =
+      Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
