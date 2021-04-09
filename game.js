@@ -43,6 +43,7 @@ function preload() {
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
   this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.plugin(
     "rexdragrotateplugin",
     "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js",
@@ -97,10 +98,10 @@ function create() {
   highDisplay = this.add
     .text(30, 550, "High Score: " + gameState.highScore)
     .setDepth(2);
-  timeDisplay = this.add.line()
-  timeDisplay.setDepth(5)
-  timeDisplay.setStrokeStyle(10, 0xA8FF8B, 1)
-  timeDisplay.setTo(0, 520, 64, 520)
+  timeDisplay = this.add.line();
+  timeDisplay.setDepth(5);
+  timeDisplay.setStrokeStyle(10, 0xa8ff8b, 1);
+  timeDisplay.setTo(0, 520, 64, 520);
 
   //create jets and hoops
   createJet(this, 130, 0);
@@ -115,16 +116,40 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
-  orangeBall.setInteractive().setScale((30 * widthScale) / orangeBall.width);
+  orangeBall
+    .setInteractive()
+    .setScale((30 * widthScale) / orangeBall.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
 
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-  ball2.setInteractive().setScale(((30 * widthScale) / orangeBall.width) * 2);
+  ball2
+    .setInteractive()
+    .setScale(((30 * widthScale) / orangeBall.width) * 2)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
@@ -327,7 +352,7 @@ function create() {
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
-        timeDisplay.setTo(0, 520, 864, 520)
+        timeDisplay.setTo(0, 520, 864, 520);
       }
     });
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
@@ -339,8 +364,12 @@ function create() {
     .image(50, 40, "speakerIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(false) && bubbleFX.setMute(false)) {
-        jetFX.setMute(true) && bubbleFX.setMute(true);
+      if (
+        jetFX.setMute(false) &&
+        bubbleFX.setMute(false) &&
+        ballFX.setMute(false)
+      ) {
+        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -350,8 +379,14 @@ function create() {
     .image(50, 40, "mutedIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(true) && bubbleFX.setMute(true)) {
-        jetFX.setMute(false) && bubbleFX.setMute(false);
+      if (
+        jetFX.setMute(true) &&
+        bubbleFX.setMute(true) &&
+        ballFX.setMute(true)
+      ) {
+        jetFX.setMute(false) &&
+          bubbleFX.setMute(false) &&
+          ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -368,8 +403,13 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
     }
   });
-  if(gameState.running){
-    timeDisplay.setTo(0, 520, 64 + ((gameState.gameEnd - Date.now()) / 25000 * 800), 520)
+  if (gameState.running) {
+    timeDisplay.setTo(
+      0,
+      520,
+      64 + ((gameState.gameEnd - Date.now()) / 25000) * 800,
+      520
+    );
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
@@ -379,6 +419,7 @@ function update() {
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
     this.sound.get("BubblePop").stop();
+    this.sound.get("ballBounce").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
