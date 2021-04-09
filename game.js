@@ -70,8 +70,8 @@ let highDisplay;
 let timeDisplay;
 let speakerIcon;
 let mutedIcon;
-let baseOn = []
-let baseOff = []
+let baseOn = [];
+let baseOff = [];
 
 //state trackers
 let jets = {
@@ -362,15 +362,15 @@ function create() {
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
         timeDisplay.setTo(0, 520, 864, 520);
-        baseOff[0].setDepth(-1)
-        baseOn[0].setDepth(1) 
-        baseOff[1].setDepth(-1)
-        baseOn[1].setDepth(1) 
-        baseOff[2].setDepth(-1)
-        baseOn[2].setDepth(1)      
+        baseOff[0].setDepth(-1);
+        baseOn[0].setDepth(1);
+        baseOff[1].setDepth(-1);
+        baseOn[1].setDepth(1);
+        baseOff[2].setDepth(-1);
+        baseOn[2].setDepth(1);
       }
     });
-    
+
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
     .image(750, 650, "buttonDisabled")
@@ -442,6 +442,12 @@ function update() {
     jetPressure(this, 0);
     jetPressure(this, 1);
     jetPressure(this, 2);
+    baseOff[0].setDepth(1);
+    baseOn[0].setDepth(-1);
+    baseOff[1].setDepth(1);
+    baseOn[1].setDepth(-1);
+    baseOff[2].setDepth(1);
+    baseOn[2].setDepth(-1);
   }
   //loop through all game objects in scene
   this.children.getChildren().forEach((gameObj) => {
@@ -634,7 +640,6 @@ function createJet(scene, xPos, jetPos) {
       }
     });
 
-  
   baseOff[jetPos].setScale((60 * widthScale) / baseOff[jetPos].width);
   baseOn[jetPos].setScale((60 * widthScale) / baseOn[jetPos].width);
 }
