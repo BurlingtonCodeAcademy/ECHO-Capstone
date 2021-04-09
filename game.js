@@ -394,6 +394,8 @@ function create() {
     homeY: 600,
   };
 
+  
+
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
     hoops.hoopState[gameObj.name] = ["empty", "empty"];
