@@ -45,6 +45,8 @@ function preload() {
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
+  this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
@@ -123,16 +125,40 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
-  orangeBall.setInteractive().setScale((30 * widthScale) / orangeBall.width);
+  orangeBall
+    .setInteractive()
+    .setScale((30 * widthScale) / orangeBall.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
 
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-  ball2.setInteractive().setScale(((30 * widthScale) / orangeBall.width) * 2);
+  ball2
+    .setInteractive()
+    .setScale(((30 * widthScale) / orangeBall.width) * 2)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
@@ -145,6 +171,10 @@ function create() {
   redSquare.name = "squareA";
   redSquare.tint = 0x808080;
   this.input.setDraggable(redSquare);
+
+  //sound fx for bubble pop
+  let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
+  bubbleFX.setMute(true);
 
   bubbleL = this.matter.add.image(215, 650, "bubble", null, {
     shape: "circle",
@@ -159,6 +189,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleL.setStatic(true);
         bubbleL.x = gameState.objData[bubbleL.name].homeX;
         bubbleL.y = gameState.objData[bubbleL.name].homeY;
@@ -183,6 +214,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleM.setStatic(true);
         bubbleM.x = gameState.objData[bubbleM.name].homeX;
         bubbleM.y = gameState.objData[bubbleM.name].homeY;
@@ -207,6 +239,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleS.setStatic(true);
         bubbleS.x = gameState.objData[bubbleS.name].homeX;
         bubbleS.y = gameState.objData[bubbleS.name].homeY;
@@ -347,8 +380,12 @@ function create() {
     .image(50, 40, "speakerIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(false)) {
-        jetFX.setMute(true);
+      if (
+        jetFX.setMute(false) &&
+        bubbleFX.setMute(false) &&
+        ballFX.setMute(false)
+      ) {
+        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -358,8 +395,14 @@ function create() {
     .image(50, 40, "mutedIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(true)) {
-        jetFX.setMute(false);
+      if (
+        jetFX.setMute(true) &&
+        bubbleFX.setMute(true) &&
+        ballFX.setMute(true)
+      ) {
+        jetFX.setMute(false) &&
+          bubbleFX.setMute(false) &&
+          ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -391,6 +434,8 @@ function update() {
     gameState.running = false;
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
+    this.sound.get("BubblePop").stop();
+    this.sound.get("ballBounce").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
