@@ -24,14 +24,16 @@ const heightScale = 600 / (config.height - 100);
 
 //load assets and plugins
 function preload() {
+  //-----------------------------------image pre loading-------------------------------//
   this.load.image("background", "assets/images/newbackground.png");
   this.load.image("jet", "assets/images/tube.png");
   this.load.image("ball", "assets/images/newball.png");
   this.load.image("airflow", "assets/images/air.png");
-  this.load.image("base", "assets/images/tube-base.png");
+  // this.load.image("base", "assets/images/tube-base.png");
+  this.load.image("baseOn", "assets/images/OnButtonBase.png"); //------------------------
+  this.load.image("baseOff", "assets/images/OffButtonBase.png"); //-----------------------
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
-  this.load.image("sidebar", "assets/images/sidebar2.png");
   this.load.image("square", "assets/images/redSquare.png");
   this.load.image("hoop0", "assets/images/tall-hoop.png");
   this.load.image("hoop1", "assets/images/short-hoop.png");
@@ -40,8 +42,10 @@ function preload() {
   this.load.image("speakerIcon", "assets/images/speaker.png");
   this.load.image("mutedIcon", "assets/images/mute.png");
   this.load.image("bubble", "assets/images/bubble.png");
+  //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
+  //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
     "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js",
@@ -64,6 +68,8 @@ let highDisplay;
 let timeDisplay;
 let speakerIcon;
 let mutedIcon;
+let baseOn = []
+let baseOff = []
 
 //state trackers
 let jets = {
@@ -96,10 +102,10 @@ function create() {
   highDisplay = this.add
     .text(30, 550, "High Score: " + gameState.highScore)
     .setDepth(2);
-  timeDisplay = this.add.line()
-  timeDisplay.setDepth(5)
-  timeDisplay.setStrokeStyle(10, 0xA8FF8B, 1)
-  timeDisplay.setTo(0, 520, 64, 520)
+  timeDisplay = this.add.line();
+  timeDisplay.setDepth(5);
+  timeDisplay.setStrokeStyle(10, 0xa8ff8b, 1);
+  timeDisplay.setTo(0, 520, 64, 520);
 
   //create jets and hoops
   createJet(this, 130, 0);
@@ -107,6 +113,9 @@ function create() {
   createJet(this, 670, 2);
   createHoop(this, 265, 328, 0); //175
   createHoop(this, 535, 355, 1); //225
+
+  // let initialBase = this.add.image(130, 500, "baseOff")
+  // initialBase.setScale((60 * widthScale) / initialBase.width).setDepth(-3)
 
   //create floatable objects
   orangeBall = this.matter.add.image(40, 600, "ball", null, {
@@ -319,9 +328,16 @@ function create() {
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
-        timeDisplay.setTo(0, 520, 864, 520)
+        timeDisplay.setTo(0, 520, 864, 520);
+        baseOff[0].setDepth(-1)
+        baseOn[0].setDepth(1) 
+        baseOff[1].setDepth(-1)
+        baseOn[1].setDepth(1) 
+        baseOff[2].setDepth(-1)
+        baseOn[2].setDepth(1)      
       }
     });
+    
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
     .image(750, 650, "buttonDisabled")
@@ -360,8 +376,13 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
     }
   });
-  if(gameState.running){
-    timeDisplay.setTo(0, 520, 64 + ((gameState.gameEnd - Date.now()) / 25000 * 800), 520)
+  if (gameState.running) {
+    timeDisplay.setTo(
+      0,
+      520,
+      64 + ((gameState.gameEnd - Date.now()) / 25000) * 800,
+      520
+    );
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
@@ -536,8 +557,8 @@ function createJet(scene, xPos, jetPos) {
       }
     });
   //create the base object and make it clickable
-  let base = scene.add
-    .image(xPos, 500, "base")
+  baseOff[jetPos] = scene.add
+    .image(xPos, 500, "baseOff")
     .setDepth(1)
     .setInteractive()
     .on("pointerdown", () => {
@@ -547,10 +568,30 @@ function createJet(scene, xPos, jetPos) {
         jetPressure(scene, 0);
         jetPressure(scene, 1);
         jetPressure(scene, 2);
+        baseOn[jetPos].setDepth(1);
+        baseOff[jetPos].setDepth(-1);
       }
     });
-  base.setScale((60 * widthScale) / base.width);
-  return [jet, air, base];
+
+  baseOn[jetPos] = scene.add
+    .image(xPos, 500, "baseOn")
+    .setDepth(-1)
+    .setInteractive()
+    .on("pointerdown", () => {
+      //if the game is running toggle the associated jet and update pressure of all jets
+      if (gameState.running) {
+        jets.enabled[jetPos] = !jets.enabled[jetPos];
+        jetPressure(scene, 0);
+        jetPressure(scene, 1);
+        jetPressure(scene, 2);
+        baseOn[jetPos].setDepth(-1);
+        baseOff[jetPos].setDepth(1);
+      }
+    });
+
+  
+  baseOff[jetPos].setScale((60 * widthScale) / baseOff[jetPos].width);
+  baseOn[jetPos].setScale((60 * widthScale) / baseOn[jetPos].width);
 }
 
 //update pressure of jet
