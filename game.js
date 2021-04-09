@@ -24,14 +24,16 @@ const heightScale = 600 / (config.height - 100);
 
 //load assets and plugins
 function preload() {
+  //-----------------------------------image pre loading-------------------------------//
   this.load.image("background", "assets/images/newbackground.png");
   this.load.image("jet", "assets/images/tube.png");
   this.load.image("ball", "assets/images/newball.png");
   this.load.image("airflow", "assets/images/air.png");
-  this.load.image("base", "assets/images/tube-base.png");
+  // this.load.image("base", "assets/images/tube-base.png");
+  this.load.image("baseOn", "assets/images/OnButtonBase.png"); //------------------------
+  this.load.image("baseOff", "assets/images/OffButtonBase.png"); //-----------------------
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
-  this.load.image("sidebar", "assets/images/sidebar2.png");
   this.load.image("square", "assets/images/redSquare.png");
   this.load.image("hoop0", "assets/images/tall-hoop.png");
   this.load.image("hoop1", "assets/images/short-hoop.png");
@@ -44,8 +46,12 @@ function preload() {
     frameWidth: 170,
     frameHeight: 75,
   });
+  //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
+  this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
     "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js",
@@ -69,6 +75,8 @@ let highDisplay;
 let timeDisplay;
 let speakerIcon;
 let mutedIcon;
+let baseOn = []
+let baseOff = []
 
 //state trackers
 let jets = {
@@ -113,22 +121,49 @@ function create() {
   createHoop(this, 265, 328, 0); //175
   createHoop(this, 535, 355, 1); //225
 
+  // let initialBase = this.add.image(130, 500, "baseOff")
+  // initialBase.setScale((60 * widthScale) / initialBase.width).setDepth(-3)
+
   //create floatable objects
   orangeBall = this.matter.add.image(40, 600, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-  orangeBall.setInteractive().setScale((30 * widthScale) / orangeBall.width);
+  orangeBall
+    .setInteractive()
+    .setScale((30 * widthScale) / orangeBall.width)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
 
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-  ball2.setInteractive().setScale(((30 * widthScale) / orangeBall.width) * 2);
+  ball2
+    .setInteractive()
+    .setScale(((30 * widthScale) / orangeBall.width) * 2)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        ballFX.play();
+      }
+    });
   ball2.name = "ballB";
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
@@ -141,6 +176,10 @@ function create() {
   redSquare.name = "squareA";
   redSquare.tint = 0x808080;
   this.input.setDraggable(redSquare);
+
+  //sound fx for bubble pop
+  let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
+  bubbleFX.setMute(true);
 
   bubbleL = this.matter.add.image(215, 650, "bubble", null, {
     shape: "circle",
@@ -155,6 +194,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleL.setStatic(true);
         bubbleL.x = gameState.objData[bubbleL.name].homeX;
         bubbleL.y = gameState.objData[bubbleL.name].homeY;
@@ -179,6 +219,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleM.setStatic(true);
         bubbleM.x = gameState.objData[bubbleM.name].homeX;
         bubbleM.y = gameState.objData[bubbleM.name].homeY;
@@ -203,6 +244,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleS.setStatic(true);
         bubbleS.x = gameState.objData[bubbleS.name].homeX;
         bubbleS.y = gameState.objData[bubbleS.name].homeY;
@@ -376,8 +418,15 @@ function create() {
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
         timeDisplay.setTo(0, 520, 864, 520);
+        baseOff[0].setDepth(-1)
+        baseOn[0].setDepth(1) 
+        baseOff[1].setDepth(-1)
+        baseOn[1].setDepth(1) 
+        baseOff[2].setDepth(-1)
+        baseOn[2].setDepth(1)      
       }
     });
+    
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
     .image(750, 650, "buttonDisabled")
@@ -387,8 +436,12 @@ function create() {
     .image(50, 40, "speakerIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(false)) {
-        jetFX.setMute(true);
+      if (
+        jetFX.setMute(false) &&
+        bubbleFX.setMute(false) &&
+        ballFX.setMute(false)
+      ) {
+        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -398,8 +451,14 @@ function create() {
     .image(50, 40, "mutedIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(true)) {
-        jetFX.setMute(false);
+      if (
+        jetFX.setMute(true) &&
+        bubbleFX.setMute(true) &&
+        ballFX.setMute(true)
+      ) {
+        jetFX.setMute(false) &&
+          bubbleFX.setMute(false) &&
+          ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -441,6 +500,8 @@ function update() {
     gameState.running = false;
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
+    this.sound.get("BubblePop").stop();
+    this.sound.get("ballBounce").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
@@ -607,8 +668,8 @@ function createJet(scene, xPos, jetPos) {
       }
     });
   //create the base object and make it clickable
-  let base = scene.add
-    .image(xPos, 500, "base")
+  baseOff[jetPos] = scene.add
+    .image(xPos, 500, "baseOff")
     .setDepth(1)
     .setInteractive()
     .on("pointerdown", () => {
@@ -618,10 +679,30 @@ function createJet(scene, xPos, jetPos) {
         jetPressure(scene, 0);
         jetPressure(scene, 1);
         jetPressure(scene, 2);
+        baseOn[jetPos].setDepth(1);
+        baseOff[jetPos].setDepth(-1);
       }
     });
-  base.setScale((60 * widthScale) / base.width);
-  return [jet, air, base];
+
+  baseOn[jetPos] = scene.add
+    .image(xPos, 500, "baseOn")
+    .setDepth(-1)
+    .setInteractive()
+    .on("pointerdown", () => {
+      //if the game is running toggle the associated jet and update pressure of all jets
+      if (gameState.running) {
+        jets.enabled[jetPos] = !jets.enabled[jetPos];
+        jetPressure(scene, 0);
+        jetPressure(scene, 1);
+        jetPressure(scene, 2);
+        baseOn[jetPos].setDepth(-1);
+        baseOff[jetPos].setDepth(1);
+      }
+    });
+
+  
+  baseOff[jetPos].setScale((60 * widthScale) / baseOff[jetPos].width);
+  baseOn[jetPos].setScale((60 * widthScale) / baseOn[jetPos].width);
 }
 
 //update pressure of jet
