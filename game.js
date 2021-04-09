@@ -34,7 +34,7 @@ function preload() {
   this.load.image("baseOff", "assets/images/OffButtonBase.png"); //-----------------------
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
-  this.load.image("square", "assets/images/redSquare.png");
+  this.load.image("leaf", "assets/images/leaf.png");
   this.load.image("hoop0", "assets/images/tall-hoop.png");
   this.load.image("hoop1", "assets/images/short-hoop.png");
   this.load.image("hoopFront", "assets/images/hoop-half.png");
@@ -46,6 +46,7 @@ function preload() {
     frameWidth: 170,
     frameHeight: 75,
   });
+  this.load.json("leafShape", "json/leaf.json");
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -65,7 +66,7 @@ let button;
 let ground;
 let orangeBall;
 let ball2;
-let redSquare;
+let leaf;
 let bubbleL;
 let bubbleM;
 let bubbleS;
@@ -75,8 +76,8 @@ let highDisplay;
 let timeDisplay;
 let speakerIcon;
 let mutedIcon;
-let baseOn = []
-let baseOff = []
+let baseOn = [];
+let baseOff = [];
 
 //state trackers
 let jets = {
@@ -168,14 +169,17 @@ function create() {
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
 
-  redSquare = this.matter.add.image(170, 600, "square", null, {
+  leaf = this.matter.add.image(170, 600, "leaf", null, {
+    shape: this.cache.json.get("leafShape").leaf,
     friction: 0.7,
-    restitution: 0.3,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
   });
-  redSquare.setInteractive();
-  redSquare.name = "squareA";
-  redSquare.tint = 0x808080;
-  this.input.setDraggable(redSquare);
+  leaf.setInteractive().setScale((45 * widthScale) / leaf.width);
+  leaf.name = "leaf";
+  leaf.tint = 0x808080;
+  this.input.setDraggable(leaf);
 
   //sound fx for bubble pop
   let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
@@ -341,11 +345,11 @@ function create() {
     homeX: 100,
     homeY: 650,
   };
-  gameState.objectsArr.push(redSquare);
-  gameState.objData[redSquare.name] = {
+  gameState.objectsArr.push(leaf);
+  gameState.objData[leaf.name] = {
     scoreVal: 150,
-    airEff: 0.4,
-    flowPenalty: 8,
+    airEff: 2.5,
+    flowPenalty: 0,
     unlockAt: 0,
     homeX: 170,
     homeY: 600,
@@ -418,15 +422,15 @@ function create() {
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 25000;
         timeDisplay.setTo(0, 520, 864, 520);
-        baseOff[0].setDepth(-1)
-        baseOn[0].setDepth(1) 
-        baseOff[1].setDepth(-1)
-        baseOn[1].setDepth(1) 
-        baseOff[2].setDepth(-1)
-        baseOn[2].setDepth(1)      
+        baseOff[0].setDepth(-1);
+        baseOn[0].setDepth(1);
+        baseOff[1].setDepth(-1);
+        baseOn[1].setDepth(1);
+        baseOff[2].setDepth(-1);
+        baseOn[2].setDepth(1);
       }
     });
-    
+
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
     .image(750, 650, "buttonDisabled")
@@ -474,6 +478,7 @@ function update() {
       gameObj.setStatic(true);
       gameObj.x = gameState.objData[gameObj.name].homeX;
       gameObj.y = gameState.objData[gameObj.name].homeY;
+      gameObj.rotation = 0;
     }
   });
   //if the game is running, adjust the length of the time display
@@ -492,6 +497,12 @@ function update() {
   ) {
     drop.rotation =
       Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
+  }
+  //leaf falling behavior
+  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1 && Date.now() % 140 < 3) {
+    let force = (Math.random() - 0.5) * 0.5;
+    leaf.setAngularVelocity(force);
+    this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
@@ -700,7 +711,6 @@ function createJet(scene, xPos, jetPos) {
       }
     });
 
-  
   baseOff[jetPos].setScale((60 * widthScale) / baseOff[jetPos].width);
   baseOn[jetPos].setScale((60 * widthScale) / baseOn[jetPos].width);
 }
