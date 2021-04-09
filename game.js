@@ -42,6 +42,7 @@ function preload() {
   this.load.image("bubble", "assets/images/bubble.png");
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
+  this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
   this.load.plugin(
     "rexdragrotateplugin",
     "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexdragrotateplugin.min.js",
@@ -137,6 +138,10 @@ function create() {
   redSquare.tint = 0x808080;
   this.input.setDraggable(redSquare);
 
+  //sound fx for bubble pop
+  let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
+  bubbleFX.setMute(true);
+
   bubbleL = this.matter.add.image(215, 650, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
@@ -150,6 +155,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleL.setStatic(true);
         bubbleL.x = gameState.objData[bubbleL.name].homeX;
         bubbleL.y = gameState.objData[bubbleL.name].homeY;
@@ -174,6 +180,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleM.setStatic(true);
         bubbleM.x = gameState.objData[bubbleM.name].homeX;
         bubbleM.y = gameState.objData[bubbleM.name].homeY;
@@ -198,6 +205,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        bubbleFX.play();
         bubbleS.setStatic(true);
         bubbleS.x = gameState.objData[bubbleS.name].homeX;
         bubbleS.y = gameState.objData[bubbleS.name].homeY;
@@ -331,8 +339,8 @@ function create() {
     .image(50, 40, "speakerIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(false)) {
-        jetFX.setMute(true);
+      if (jetFX.setMute(false) && bubbleFX.setMute(false)) {
+        jetFX.setMute(true) && bubbleFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -342,8 +350,8 @@ function create() {
     .image(50, 40, "mutedIcon")
     .setInteractive()
     .on("pointerdown", () => {
-      if (jetFX.setMute(true)) {
-        jetFX.setMute(false);
+      if (jetFX.setMute(true) && bubbleFX.setMute(true)) {
+        jetFX.setMute(false) && bubbleFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -370,6 +378,7 @@ function update() {
     gameState.running = false;
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
+    this.sound.get("BubblePop").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
