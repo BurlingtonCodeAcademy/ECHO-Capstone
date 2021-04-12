@@ -250,11 +250,6 @@ function create() {
   airplane.tint = 0x808080;
   this.input.setDraggable(airplane);
 
-
-  //sound fx for bubble pop
-  let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
-  bubbleFX.setMute(true);
-
   bubbleL = this.matter.add.image(215, 650, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
