@@ -200,13 +200,10 @@ function create() {
     frictionAir: 0,
     gravityScale: { x: 0 },
   });
-  anvil
-    .setInteractive()
-    .setScale((45 * heightScale) / anvil.height)
+  anvil.setInteractive().setScale((45 * heightScale) / anvil.height);
   anvil.name = "anvil";
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
-  
 
   balloon = this.matter.add.image(170, 600, "balloon", null, {
     shape: this.cache.json.get("balloonShape").balloon,
@@ -214,9 +211,7 @@ function create() {
     density: 0.0007,
     frictionAir: 0.12,
   });
-  balloon
-    .setInteractive()
-    .setScale((55 * heightScale) / balloon.height)
+  balloon.setInteractive().setScale((55 * heightScale) / balloon.height);
   balloon.name = "balloon";
   balloon.tint = 0x808080;
   this.input.setDraggable(balloon);
@@ -233,11 +228,11 @@ function create() {
   fabric.tint = 0x808080;
   this.input.setDraggable(fabric);
 
-  parachute = this.matter.add.image(450, 600, "parachute", null, {
+  parachute = this.matter.add.image(445, 600, "parachute", null, {
     shape: this.cache.json.get("parachuteShape").parachute,
     friction: 0.7,
     restitution: 0,
-    frictionAir: 0.08,
+    frictionAir: 0.12,
     gravityScale: { x: 0.2 },
   });
   parachute.setInteractive().setScale((45 * widthScale) / parachute.width);
@@ -245,7 +240,7 @@ function create() {
   parachute.tint = 0x808080;
   this.input.setDraggable(parachute);
 
-  airplane = this.matter.add.image(390, 655, "airplane", null, {
+  airplane = this.matter.add.image(375, 655, "airplane", null, {
     shape: this.cache.json.get("airplaneShape").airplane,
     friction: 0.7,
     restitution: 0,
@@ -379,14 +374,14 @@ function create() {
   drop.tint = 0x808080;
   this.input.setDraggable(drop);
 
-  this.matter.world.on('collisionstart', (evt, bodyA, bodyB) => {
-    if(bodyA.label === 'anvil' || bodyB.label === 'anvil'){
+  this.matter.world.on("collisionstart", (evt, bodyA, bodyB) => {
+    if (bodyA.label === "anvil" || bodyB.label === "anvil") {
       anvilFX.play();
     }
-    if(bodyA.label === 'balloon' || bodyB.label === 'balloon'){
+    if (bodyA.label === "balloon" || bodyB.label === "balloon") {
       balloonFX.play();
     }
-})
+  });
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
@@ -395,15 +390,16 @@ function create() {
     }
   });
   this.input.on("dragstart", (pointer, gameObject) => {
-    // gameState.objectsArr.forEach(resetObj => {
-    //   if(gameObject.name !== resetObj.name){
-    //     if(!resetObj.isStatic()){
-    //       resetObj.setStatic(true)
-    //     }
-    //     resetObj.x = gameState.objData[resetObj.name].homeX
-    //     resetObj.y = gameState.objData[resetObj.name].homeY
-    //   }
-    // })
+    gameState.objectsArr.forEach((resetObj) => {
+      if (gameObject.name !== resetObj.name) {
+        if (!resetObj.isStatic()) {
+          resetObj.setStatic(true);
+        }
+        resetObj.x = gameState.objData[resetObj.name].homeX;
+        resetObj.y = gameState.objData[resetObj.name].homeY;
+        resetObj.rotation = 0;
+      }
+    });
     gameObject.setCollisionCategory(null);
     if (!gameObject.isStatic()) {
       gameObject.setStatic(true);
@@ -436,101 +432,111 @@ function create() {
     scoreVal: 100,
     airEff: 2,
     flowPenalty: 4,
-    unlockAt: 0,
+    unlockAt: 150,
     homeX: 100,
     homeY: 650,
   };
+  this.add.text(85, 600, gameState.objData[ball2.name].unlockAt)
   gameState.objectsArr.push(leaf);
   gameState.objData[leaf.name] = {
-    scoreVal: 150,
+    scoreVal: 250,
     airEff: 2.5,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 500,
     homeX: 300,
     homeY: 600,
     floatRight: true,
   };
+  this.add.text(280,620,gameState.objData[leaf.name].unlockAt)
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
-    scoreVal: 250,
+    scoreVal: 400,
     airEff: 5,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 800,
     homeX: 500,
     homeY: 655,
   };
   gameState.objectsArr.push(bubbleM);
   gameState.objData[bubbleM.name] = {
-    scoreVal: 250,
+    scoreVal: 400,
     airEff: 3,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: gameState.objData[bubbleL.name].unlockAt,
     homeX: 530,
     homeY: 640,
   };
   gameState.objectsArr.push(bubbleS);
   gameState.objData[bubbleS.name] = {
-    scoreVal: 250,
+    scoreVal: 400,
     airEff: 1.5,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: gameState.objData[bubbleL.name].unlockAt,
     homeX: 512,
     homeY: 625,
   };
+  this.add.text(490,600,gameState.objData[bubbleL.name].unlockAt)
   gameState.objectsArr.push(drop);
   gameState.objData[drop.name] = {
-    scoreVal: 300,
+    scoreVal: 450,
     airEff: 1,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 900,
     homeX: 570,
     homeY: 595,
   };
+  this.add.text(555, 620, gameState.objData[drop.name].unlockAt)
   gameState.objectsArr.push(anvil);
   gameState.objData[anvil.name] = {
     scoreVal: 300,
     airEff: 0,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 1000,
     homeX: 650,
     homeY: 650,
   };
+  this.add.text(625,610,gameState.objData[anvil.name].unlockAt)
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
-    scoreVal: 300,
+    scoreVal: 150,
     airEff: 4,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 250,
     homeX: 170,
     homeY: 600,
   };
+  this.add.text(150,630,gameState.objData[balloon.name].unlockAt)
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
     airEff: 2.5,
     flowPenalty: 0,
-    unlockAt: 0,
-    homeX: 390,
+    unlockAt: 600,
+    homeX: 375,
     homeY: 655,
   };
+  this.add.text(350,620,gameState.objData[airplane.name].unlockAt)
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
-    scoreVal: 300,
+    scoreVal: 200,
     airEff: 2,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 400,
     homeX: 225,
     homeY: 650,
   };
+  this.add.text(210,615,gameState.objData[fabric.name].unlockAt)
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
-    scoreVal: 300,
+    scoreVal: 350,
     airEff: 2.5,
     flowPenalty: 0,
-    unlockAt: 0,
-    homeX: 450,
+    unlockAt: 700,
+    homeX: 445,
     homeY: 600,
+    floatRight: false
   };
+  this.add.text(430,650,gameState.objData[parachute.name].unlockAt)
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -656,12 +662,6 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
       gameObj.rotation = 0;
     }
-    // if(isNaN(gameObj.x) || isNaN(gameObj.y)){
-    //   console.log('NaN detected')
-    //   gameObj.x = gameState.objData[gameObj.name].homeX;
-    //   gameObj.y = gameState.objData[gameObj.name].homeY;
-
-    // }
   });
   //if the game is running, adjust the length of the time display
   if (gameState.running) {
@@ -681,13 +681,7 @@ function update() {
       Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
   }
   //leaf falling behavior
-  if (
-    !leaf.isStatic() &&
-    leaf.body.velocity.y > 0.1 /*&& Date.now() % 140 < 3*/
-  ) {
-    // let force = (Math.random() - 0.5) * 0.5;
-    // leaf.setAngularVelocity(force);
-    // this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
+  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1) {
     if (leaf.rotation > Math.PI / 5) {
       gameState.objData[leaf.name].floatRight = true;
     } else if (leaf.rotation < Math.PI / -5) {
@@ -699,6 +693,23 @@ function update() {
     }
     this.matter.applyForceFromAngle(leaf, 0.0005 * floatDir);
     leaf.rotation = leaf.rotation - 0.02 * floatDir;
+  }
+  //Airplane falling behavior
+  if(!airplane.isStatic() && airplane.body.velocity.y > 0.2 && Math.abs(airplane.rotation) < (Math.PI / 4)){
+    this.matter.applyForceFromAngle(airplane, .001)
+  }
+  //parachute falling behavior
+  if(!parachute.isStatic() && parachute.body.velocity.y > 0.1){
+    if(parachute.rotation < Math.PI / -4){
+      gameState.objData[parachute.name].floatRight = false
+    }else if(parachute.rotation > Math.PI / 4){
+      gameState.objData[parachute.name].floatRight = true
+    }
+    if(gameState.objData[parachute.name].floatRight){
+      parachute.rotation = parachute.rotation - .02
+    }else{
+      parachute.rotation = parachute.rotation + .02
+    }
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
@@ -764,7 +775,7 @@ function update() {
         }
       });
       //find hoops
-    } else if (gameObj.name.startsWith("hoop")) {
+    } else if (gameObj.name.startsWith("hoop") && gameState.running) {
       //determine which hoop has been found
       let hoopPos = parseInt(gameObj.name[4]);
       //loop through floatable objects - hoop position and the name of the floatable object is used to track hoop state
