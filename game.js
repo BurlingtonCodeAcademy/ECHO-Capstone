@@ -495,44 +495,44 @@ function create() {
     airEff: 0,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 280,
-    homeY: 645,
+    homeX: 320,
+    homeY: 650,
   };
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 295,
-    homeY: 660,
+    homeX: 335,
+    homeY: 600,
   };
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 305,
-    homeY: 675,
+    homeX: 440,
+    homeY: 650,
   };
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 315,
-    homeY: 685,
+    homeX: 400,
+    homeY: 600,
   };
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 325,
-    homeY: 695,
+    homeX: 525,
+    homeY: 650,
   };
 
   //use gameState's array to populate hoopState
