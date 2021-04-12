@@ -42,12 +42,20 @@ function preload() {
   this.load.image("mutedIcon", "assets/images/mute.png");
   this.load.image("bubble", "assets/images/bubble.png");
   this.load.image("anvil", "assets/images/anvil.png");
+  this.load.image("balloon", "assets/images/Balloon.png");
+  this.load.image("airplane", "assets/images/airplane.png");
+  this.load.image("fabric", "assets/images/fabric.png");
+  this.load.image("parachute", "assets/images/parachute.png");
   this.load.spritesheet("drop", "assets/images/waterAnimation.png", {
     frameWidth: 170,
     frameHeight: 75,
   });
   this.load.json("leafShape", "json/leaf.json");
-  this.load.json("anvilShape", "json/anvil.json")
+  this.load.json("anvilShape", "json/anvil.json");
+  this.load.json("balloonShape", "json/balloon.json");
+  this.load.json("airplaneShape", "json/airplane.json");
+  this.load.json("fabricShape", "json/fabric.json");
+  this.load.json("parachuteShape", "json/parachute.json");
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -64,7 +72,11 @@ function preload() {
 //global variables
 //game objects
 let startButton;
+let fabric;
+let parachute;
+let airplane;
 let anvil;
+let balloon;
 let button;
 let ground;
 let orangeBall;
@@ -196,6 +208,55 @@ function create() {
   anvil.name = "anvil";
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
+
+  balloon = this.matter.add.image(200, 600, "balloon", null, {
+    shape: this.cache.json.get("balloonShape").balloon,
+    friction: 0.7,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
+  });
+  balloon.setInteractive().setScale((45 * widthScale) / balloon.width);
+  balloon.name = "balloon";
+  balloon.tint = 0x808080;
+  this.input.setDraggable(balloon);
+
+  fabric = this.matter.add.image(200, 600, "fabric", null, {
+    shape: this.cache.json.get("fabricShape").fabric,
+    friction: 0.7,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
+  });
+  fabric.setInteractive().setScale((45 * widthScale) / fabric.width);
+  fabric.name = "fabric";
+  fabric.tint = 0x808080;
+  this.input.setDraggable(fabric);
+
+  parachute = this.matter.add.image(200, 600, "parachute", null, {
+    shape: this.cache.json.get("parachuteShape").parachute,
+    friction: 0.7,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
+  });
+  parachute.setInteractive().setScale((45 * widthScale) / parachute.width);
+  parachute.name = "parachute";
+  parachute.tint = 0x808080;
+  this.input.setDraggable(parachute);
+
+  airplane = this.matter.add.image(200, 600, "airplane", null, {
+    shape: this.cache.json.get("airplaneShape").airplane,
+    friction: 0.7,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
+  });
+  airplane.setInteractive().setScale((45 * widthScale) / airplane.width);
+  airplane.name = "airplane";
+  airplane.tint = 0x808080;
+  this.input.setDraggable(airplane);
+
 
   //sound fx for bubble pop
   let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
@@ -421,13 +482,49 @@ function create() {
     homeY: 600,
   };
   gameState.objectsArr.push(anvil);
-  gameState.objData[drop.name] = {
+  gameState.objData[anvil.name] = {
     scoreVal: 300,
     airEff: 0,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 280,
     homeY: 645,
+  };
+  gameState.objectsArr.push(balloon);
+  gameState.objData[balloon.name] = {
+    scoreVal: 300,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 295,
+    homeY: 660,
+  };
+  gameState.objectsArr.push(airplane);
+  gameState.objData[airplane.name] = {
+    scoreVal: 300,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 305,
+    homeY: 675,
+  };
+  gameState.objectsArr.push(fabric);
+  gameState.objData[fabric.name] = {
+    scoreVal: 300,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 315,
+    homeY: 685,
+  };
+  gameState.objectsArr.push(parachute);
+  gameState.objData[parachute.name] = {
+    scoreVal: 300,
+    airEff: 1,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 325,
+    homeY: 695,
   };
 
   
