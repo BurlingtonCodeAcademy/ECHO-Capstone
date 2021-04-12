@@ -29,9 +29,8 @@ function preload() {
   this.load.image("jet", "assets/images/tube.png");
   this.load.image("ball", "assets/images/newball.png");
   this.load.image("airflow", "assets/images/air.png");
-  // this.load.image("base", "assets/images/tube-base.png");
-  this.load.image("baseOn", "assets/images/OnButtonBase.png"); //------------------------
-  this.load.image("baseOff", "assets/images/OffButtonBase.png"); //-----------------------
+  this.load.image("baseOn", "assets/images/OnButtonBase.png"); 
+  this.load.image("baseOff", "assets/images/OffButtonBase.png"); 
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
   this.load.image("square", "assets/images/redSquare.png");
@@ -441,7 +440,9 @@ function create() {
         bubbleFX.setMute(false) &&
         ballFX.setMute(false)
       ) {
-        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true);
+        jetFX.setMute(true)
+        bubbleFX.setMute(true)
+        ballFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -456,9 +457,9 @@ function create() {
         bubbleFX.setMute(true) &&
         ballFX.setMute(true)
       ) {
-        jetFX.setMute(false) &&
-          bubbleFX.setMute(false) &&
-          ballFX.setMute(false);
+        jetFX.setMute(false)
+        bubbleFX.setMute(false)
+        ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -636,6 +637,7 @@ function update() {
       });
     }
   });
+  
 }
 
 //create jet function, also handles airflow and base
