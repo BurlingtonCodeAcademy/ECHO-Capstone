@@ -29,8 +29,8 @@ function preload() {
   this.load.image("jet", "assets/images/tube.png");
   this.load.image("ball", "assets/images/newball.png");
   this.load.image("airflow", "assets/images/air.png");
-  this.load.image("baseOn", "assets/images/OnButtonBase.png"); 
-  this.load.image("baseOff", "assets/images/OffButtonBase.png"); 
+  this.load.image("baseOn", "assets/images/OnButtonBase.png");
+  this.load.image("baseOff", "assets/images/OffButtonBase.png");
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
   this.load.image("leaf", "assets/images/leaf.png");
@@ -61,7 +61,9 @@ function preload() {
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
   this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
   this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
-  this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"])
+  this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"]);
+  this.load.audio("anvilDrop", ["assets/sfx/anvilDrop.mp3"]);
+  this.load.audio("balloon", ["assets/sfx/balloon.mp3"]);
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
@@ -197,7 +199,17 @@ function create() {
     frictionAir: 0,
     gravityScale: { x: 0 },
   });
-  anvil.setInteractive().setScale((45 * heightScale) / anvil.height);
+  anvil
+    .setInteractive()
+    .setScale((45 * heightScale) / anvil.height)
+    .setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+      ) {
+        anvilFX.play();
+      }
+    });
   anvil.name = "anvil";
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
@@ -208,7 +220,14 @@ function create() {
     density: 0.0007,
     frictionAir: 0.12,
   });
-  balloon.setInteractive().setScale((55 * heightScale) / balloon.height);
+  balloon.setInteractive().setScale((55 * heightScale) / balloon.height).setOnCollide((pair) => {
+      if (
+        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
+        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
+    ) {
+      balloonFX.play();
+    }
+  });
   balloon.name = "balloon";
   balloon.tint = 0x808080;
   this.input.setDraggable(balloon);
@@ -351,10 +370,10 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         waterFX.play();
-        if(!drop.isStatic()){
+        if (!drop.isStatic()) {
           drop.setStatic(true);
         }
-        drop.setCollisionCategory(null)
+        drop.setCollisionCategory(null);
         hoops.hoopState[drop.name][0] = "empty";
         hoops.hoopState[drop.name][1] = "empty";
         drop.anims.play("splash");
@@ -364,7 +383,7 @@ function create() {
       drop.x = gameState.objData[drop.name].homeX;
       drop.y = gameState.objData[drop.name].homeY;
       drop.rotation = 0;
-      drop.setCollisionCategory(1)
+      drop.setCollisionCategory(1);
       drop.anims.play("normalDrop");
     });
   drop.name = "waterDrop";
@@ -431,7 +450,7 @@ function create() {
     unlockAt: 0,
     homeX: 300,
     homeY: 600,
-    floatRight: true
+    floatRight: true,
   };
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
@@ -515,8 +534,6 @@ function create() {
     homeY: 600,
   };
 
-  
-
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
     hoops.hoopState[gameObj.name] = ["empty", "empty"];
@@ -535,9 +552,15 @@ function create() {
   let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
   bubbleFX.setMute(true);
 
-   //sound fx for water drop
-   let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
-   waterFX.setMute(true);
+  //sound fx for water drop
+  let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
+  waterFX.setMute(true);
+
+  let anvilFX = this.sound.add("anvilDrop", { volume: 0.55 });
+  anvilFX.setMute(true);
+
+  let balloonFX = this.sound.add("balloon", { volume: 0.55 });
+  balloonFX.setMute(true);
 
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
@@ -585,11 +608,16 @@ function create() {
         jetFX.setMute(false) &&
         bubbleFX.setMute(false) &&
         ballFX.setMute(false) &&
-        waterFX.setMute(false)
+        waterFX.setMute(false) &&
+        anvilFX.setMute(false) &&
+        balloonFX.setMute(false)
       ) {
-        jetFX.setMute(true)
-        bubbleFX.setMute(true)
+        jetFX.setMute(true);
+        bubbleFX.setMute(true);
         ballFX.setMute(true);
+        waterFX.setMute(true);
+        anvilFX.setMute(true);
+        balloonFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -603,12 +631,16 @@ function create() {
         jetFX.setMute(true) &&
         bubbleFX.setMute(true) &&
         ballFX.setMute(true) &&
-        waterFX.setMute(true)
+        waterFX.setMute(true) &&
+        anvilFX.setMute(true) &&
+        balloonFX.setMute(true)
       ) {
         jetFX.setMute(false);
         bubbleFX.setMute(false);
         ballFX.setMute(false);
-        waterFX.setMute(false)
+        waterFX.setMute(false);
+        anvilFX.setMute(false);
+        balloonFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -630,7 +662,7 @@ function update() {
     //   console.log('NaN detected')
     //   gameObj.x = gameState.objData[gameObj.name].homeX;
     //   gameObj.y = gameState.objData[gameObj.name].homeY;
-      
+
     // }
   });
   //if the game is running, adjust the length of the time display
@@ -651,21 +683,24 @@ function update() {
       Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
   }
   //leaf falling behavior
-  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1 /*&& Date.now() % 140 < 3*/) {
+  if (
+    !leaf.isStatic() &&
+    leaf.body.velocity.y > 0.1 /*&& Date.now() % 140 < 3*/
+  ) {
     // let force = (Math.random() - 0.5) * 0.5;
     // leaf.setAngularVelocity(force);
     // this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
-    if(leaf.rotation > Math.PI / 5){
-      gameState.objData[leaf.name].floatRight = true
-    }else if(leaf.rotation < Math.PI / -5){
-      gameState.objData[leaf.name].floatRight = false
+    if (leaf.rotation > Math.PI / 5) {
+      gameState.objData[leaf.name].floatRight = true;
+    } else if (leaf.rotation < Math.PI / -5) {
+      gameState.objData[leaf.name].floatRight = false;
     }
-    let floatDir = -1
-    if(gameState.objData[leaf.name].floatRight){
-      floatDir = 1
+    let floatDir = -1;
+    if (gameState.objData[leaf.name].floatRight) {
+      floatDir = 1;
     }
-    this.matter.applyForceFromAngle(leaf, .0005 * floatDir)
-    leaf.rotation = leaf.rotation - (.02 * floatDir)
+    this.matter.applyForceFromAngle(leaf, 0.0005 * floatDir);
+    leaf.rotation = leaf.rotation - 0.02 * floatDir;
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
@@ -677,6 +712,8 @@ function update() {
     this.sound.get("BubblePop").stop();
     this.sound.get("ballBounce").stop();
     this.sound.get("waterDrop").stop();
+    this.sound.get("anvilDrop").stop();
+    this.sound.get("balloon").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
@@ -811,7 +848,6 @@ function update() {
       });
     }
   });
-  
 }
 
 //create jet function, also handles airflow and base
