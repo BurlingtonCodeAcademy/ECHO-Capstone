@@ -64,6 +64,7 @@ function preload() {
   this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"]);
   this.load.audio("anvilDrop", ["assets/sfx/anvilDrop.mp3"]);
   this.load.audio("balloon", ["assets/sfx/balloon.mp3"]);
+  this.load.audio("paperPlane", ["assets/sfx/paperPlane.mp3"]);
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
@@ -381,6 +382,9 @@ function create() {
     if (bodyA.label === "balloon" || bodyB.label === "balloon") {
       balloonFX.play();
     }
+    if (bodyA.label === "airplane" || bodyB.label === "airplane") {
+        planeFX.play();
+    }
   });
 
   //drag events
@@ -568,6 +572,9 @@ function create() {
 
   let balloonFX = this.sound.add("balloon", { volume: 0.55 });
   balloonFX.setMute(true);
+  
+  let planeFX = this.sound.add("paperPlane", { volume: 0.55 });
+  planeFX.setMute(true);
 
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
@@ -617,7 +624,8 @@ function create() {
         ballFX.setMute(false) &&
         waterFX.setMute(false) &&
         anvilFX.setMute(false) &&
-        balloonFX.setMute(false)
+        balloonFX.setMute(false) &&
+        planeFX.setMute(false)
       ) {
         jetFX.setMute(true);
         bubbleFX.setMute(true);
@@ -625,6 +633,7 @@ function create() {
         waterFX.setMute(true);
         anvilFX.setMute(true);
         balloonFX.setMute(true);
+        planeFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -640,7 +649,8 @@ function create() {
         ballFX.setMute(true) &&
         waterFX.setMute(true) &&
         anvilFX.setMute(true) &&
-        balloonFX.setMute(true)
+        balloonFX.setMute(true) &&
+        planeFX.setMute(true)
       ) {
         jetFX.setMute(false);
         bubbleFX.setMute(false);
@@ -648,6 +658,7 @@ function create() {
         waterFX.setMute(false);
         anvilFX.setMute(false);
         balloonFX.setMute(false);
+        planeFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -729,6 +740,7 @@ function update() {
     this.sound.get("waterDrop").stop();
     this.sound.get("anvilDrop").stop();
     this.sound.get("balloon").stop();
+    this.sound.get("paperPlane").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
