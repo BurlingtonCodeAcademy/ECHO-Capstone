@@ -42,11 +42,13 @@ function preload() {
   this.load.image("speakerIcon", "assets/images/speaker.png");
   this.load.image("mutedIcon", "assets/images/mute.png");
   this.load.image("bubble", "assets/images/bubble.png");
+  this.load.image("anvil", "assets/images/anvil.png");
   this.load.spritesheet("drop", "assets/images/waterAnimation.png", {
     frameWidth: 170,
     frameHeight: 75,
   });
   this.load.json("leafShape", "json/leaf.json");
+  this.load.json("anvilShape", "json/anvil.json")
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
@@ -63,6 +65,7 @@ function preload() {
 //global variables
 //game objects
 let startButton;
+let anvil;
 let button;
 let ground;
 let orangeBall;
@@ -182,6 +185,18 @@ function create() {
   leaf.name = "leaf";
   leaf.tint = 0x808080;
   this.input.setDraggable(leaf);
+
+  anvil = this.matter.add.image(200, 600, "anvil", null, {
+    shape: this.cache.json.get("anvilShape").anvil,
+    friction: 0.7,
+    restitution: 0,
+    frictionAir: 0,
+    gravityScale: { x: 0 },
+  });
+  anvil.setInteractive().setScale((45 * widthScale) / anvil.width);
+  anvil.name = "anvil";
+  anvil.tint = 0x808080;
+  this.input.setDraggable(anvil);
 
   //sound fx for bubble pop
   let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
@@ -396,6 +411,15 @@ function create() {
     unlockAt: 0,
     homeX: 270,
     homeY: 600,
+  };
+  gameState.objectsArr.push(anvil);
+  gameState.objData[drop.name] = {
+    scoreVal: 300,
+    airEff: 0,
+    flowPenalty: 0,
+    unlockAt: 0,
+    homeX: 280,
+    homeY: 645,
   };
 
   
