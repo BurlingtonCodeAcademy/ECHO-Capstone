@@ -1,23 +1,9 @@
 {
   "dependencies": {
-    "phaser": "^3.53.1"
+    "express": "^4.17.1"
   },
-  "name": "ECHO-Capstone",
-  "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BurlingtonCodeAcademy/ECHO-Capstone.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/BurlingtonCodeAcademy/ECHO-Capstone/issues"
-  },
-  "homepage": "https://github.com/BurlingtonCodeAcademy/ECHO-Capstone#readme",
-  "description": ""
+    "heroku-postbuild": "cd client && npm install",
+    "start": "node server.js"
+  }
 }
