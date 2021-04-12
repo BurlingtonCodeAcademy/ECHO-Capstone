@@ -16,7 +16,7 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "balloon",
 				"isSensor": false,
 				"vertices": [
 					[ { "x":51, "y":171 }, { "x":48, "y":161 }, { "x":43, "y":159 }, { "x":37, "y":167 }, { "x":43, "y":169 } ],

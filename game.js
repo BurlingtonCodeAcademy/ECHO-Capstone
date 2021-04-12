@@ -154,6 +154,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        console.log("ball sound");
         ballFX.play();
       }
     });
@@ -202,17 +203,10 @@ function create() {
   anvil
     .setInteractive()
     .setScale((45 * heightScale) / anvil.height)
-    .setOnCollide((pair) => {
-      if (
-        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
-        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
-      ) {
-        anvilFX.play();
-      }
-    });
   anvil.name = "anvil";
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
+  
 
   balloon = this.matter.add.image(170, 600, "balloon", null, {
     shape: this.cache.json.get("balloonShape").balloon,
@@ -220,14 +214,9 @@ function create() {
     density: 0.0007,
     frictionAir: 0.12,
   });
-  balloon.setInteractive().setScale((55 * heightScale) / balloon.height).setOnCollide((pair) => {
-      if (
-        (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
-        (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
-    ) {
-      balloonFX.play();
-    }
-  });
+  balloon
+    .setInteractive()
+    .setScale((55 * heightScale) / balloon.height)
   balloon.name = "balloon";
   balloon.tint = 0x808080;
   this.input.setDraggable(balloon);
@@ -389,6 +378,15 @@ function create() {
   drop.name = "waterDrop";
   drop.tint = 0x808080;
   this.input.setDraggable(drop);
+
+  this.matter.world.on('collisionstart', (evt, bodyA, bodyB) => {
+    if(bodyA.label === 'anvil' || bodyB.label === 'anvil'){
+      anvilFX.play();
+    }
+    if(bodyA.label === 'balloon' || bodyB.label === 'balloon'){
+      balloonFX.play();
+    }
+})
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
