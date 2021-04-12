@@ -29,9 +29,8 @@ function preload() {
   this.load.image("jet", "assets/images/tube.png");
   this.load.image("ball", "assets/images/newball.png");
   this.load.image("airflow", "assets/images/air.png");
-  // this.load.image("base", "assets/images/tube-base.png");
-  this.load.image("baseOn", "assets/images/OnButtonBase.png"); //------------------------
-  this.load.image("baseOff", "assets/images/OffButtonBase.png"); //-----------------------
+  this.load.image("baseOn", "assets/images/OnButtonBase.png"); 
+  this.load.image("baseOff", "assets/images/OffButtonBase.png"); 
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
   this.load.image("leaf", "assets/images/leaf.png");
@@ -331,6 +330,15 @@ function create() {
     }
   });
   this.input.on("dragstart", (pointer, gameObject) => {
+    gameState.objectsArr.forEach(resetObj => {
+      if(gameObject.name !== resetObj.name){
+        if(!resetObj.isStatic()){
+          resetObj.setStatic(true)
+        }
+        resetObj.x = gameState.objData[resetObj.name].homeX
+        resetObj.y = gameState.objData[resetObj.name].homeY
+      }
+    })
     gameObject.setCollisionCategory(null);
     if (!gameObject.isStatic()) {
       gameObject.setStatic(true);
@@ -461,6 +469,7 @@ function create() {
         baseOn[1].setDepth(1);
         baseOff[2].setDepth(-1);
         baseOn[2].setDepth(1);
+        gameState.objectsArr.forEach(printObj => {console.log(printObj.name + '- X: ' + printObj.x + ', Y: ' + printObj.y)})
       }
     });
 
@@ -479,7 +488,9 @@ function create() {
         ballFX.setMute(false) &&
         waterFX.setMute(false)
       ) {
-        jetFX.setMute(true) && bubbleFX.setMute(true) && ballFX.setMute(true) && waterFX.setMute(true);
+        jetFX.setMute(true)
+        bubbleFX.setMute(true)
+        ballFX.setMute(true);
         speakerIcon.setDepth(-6);
         mutedIcon.setDepth(1);
       }
@@ -495,10 +506,9 @@ function create() {
         ballFX.setMute(true) &&
         waterFX.setMute(true)
       ) {
-        jetFX.setMute(false) &&
-          bubbleFX.setMute(false) &&
-          ballFX.setMute(false) &&
-          waterFX.setMute(false);
+        jetFX.setMute(false);
+        bubbleFX.setMute(false);
+        ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
@@ -516,6 +526,12 @@ function update() {
       gameObj.y = gameState.objData[gameObj.name].homeY;
       gameObj.rotation = 0;
     }
+    // if(isNaN(gameObj.x) || isNaN(gameObj.y)){
+    //   console.log('NaN detected')
+    //   gameObj.x = gameState.objData[gameObj.name].homeX;
+    //   gameObj.y = gameState.objData[gameObj.name].homeY;
+      
+    // }
   });
   //if the game is running, adjust the length of the time display
   if (gameState.running) {
@@ -684,6 +700,7 @@ function update() {
       });
     }
   });
+  
 }
 
 //create jet function, also handles airflow and base
