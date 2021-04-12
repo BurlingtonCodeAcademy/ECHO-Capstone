@@ -292,7 +292,10 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         waterFX.play();
-        drop.setStatic(true);
+        if(!drop.isStatic()){
+          drop.setStatic(true);
+        }
+        drop.setCollisionCategory(null)
         hoops.hoopState[drop.name][0] = "empty";
         hoops.hoopState[drop.name][1] = "empty";
         drop.anims.play("splash");
@@ -302,6 +305,7 @@ function create() {
       drop.x = gameState.objData[drop.name].homeX;
       drop.y = gameState.objData[drop.name].homeY;
       drop.rotation = 0;
+      drop.setCollisionCategory(1)
       drop.anims.play("normalDrop");
     });
   drop.name = "waterDrop";
@@ -315,15 +319,15 @@ function create() {
     }
   });
   this.input.on("dragstart", (pointer, gameObject) => {
-    gameState.objectsArr.forEach(resetObj => {
-      if(gameObject.name !== resetObj.name){
-        if(!resetObj.isStatic()){
-          resetObj.setStatic(true)
-        }
-        resetObj.x = gameState.objData[resetObj.name].homeX
-        resetObj.y = gameState.objData[resetObj.name].homeY
-      }
-    })
+    // gameState.objectsArr.forEach(resetObj => {
+    //   if(gameObject.name !== resetObj.name){
+    //     if(!resetObj.isStatic()){
+    //       resetObj.setStatic(true)
+    //     }
+    //     resetObj.x = gameState.objData[resetObj.name].homeX
+    //     resetObj.y = gameState.objData[resetObj.name].homeY
+    //   }
+    // })
     gameObject.setCollisionCategory(null);
     if (!gameObject.isStatic()) {
       gameObject.setStatic(true);
@@ -368,6 +372,7 @@ function create() {
     unlockAt: 0,
     homeX: 170,
     homeY: 600,
+    floatRight: true
   };
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
@@ -443,7 +448,7 @@ function create() {
         baseOn[1].setDepth(1);
         baseOff[2].setDepth(-1);
         baseOn[2].setDepth(1);
-        gameState.objectsArr.forEach(printObj => {console.log(printObj.name + '- X: ' + printObj.x + ', Y: ' + printObj.y)})
+        //gameState.objectsArr.forEach(printObj => {console.log(printObj.name + '- X: ' + printObj.x + ', Y: ' + printObj.y)})
       }
     });
 
@@ -525,10 +530,21 @@ function update() {
       Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
   }
   //leaf falling behavior
-  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1 && Date.now() % 140 < 3) {
-    let force = (Math.random() - 0.5) * 0.5;
-    leaf.setAngularVelocity(force);
-    this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
+  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1 /*&& Date.now() % 140 < 3*/) {
+    // let force = (Math.random() - 0.5) * 0.5;
+    // leaf.setAngularVelocity(force);
+    // this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
+    if(leaf.rotation > Math.PI / 5){
+      gameState.objData[leaf.name].floatRight = true
+    }else if(leaf.rotation < Math.PI / -5){
+      gameState.objData[leaf.name].floatRight = false
+    }
+    let floatDir = -1
+    if(gameState.objData[leaf.name].floatRight){
+      floatDir = 1
+    }
+    this.matter.applyForceFromAngle(leaf, .0005 * floatDir)
+    leaf.rotation = leaf.rotation - (.02 * floatDir)
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
