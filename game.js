@@ -137,19 +137,12 @@ function create() {
   createHoop(this, 265, 328, 0); //175
   createHoop(this, 535, 355, 1); //225
 
-  // let initialBase = this.add.image(130, 500, "baseOff")
-  // initialBase.setScale((60 * widthScale) / initialBase.width).setDepth(-3)
-
   //create floatable objects
   orangeBall = this.matter.add.image(40, 600, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
   });
-
-  //sound fx for ball bounce
-  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
-  ballFX.setMute(true);
 
   orangeBall
     .setInteractive()
@@ -336,10 +329,6 @@ function create() {
   bubbleS.name = "bubbleSmall";
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
-
-  //sound fx for water drop
-  let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
-  waterFX.setMute(true);
 
   drop = this.matter.add.sprite(270, 600, "drop", 0, { shape: "circle" });
   this.anims.create({
@@ -534,9 +523,23 @@ function create() {
     hoops.hoopState[gameObj.name] = ["empty", "empty"];
   });
 
-  //--------------------------------------------Sound for the air--------------------------------//
+  //-------------------------------------------------------------Sound FX------------------------------------------------------------------------//
+  //sound FX for air
   let jetFX = this.sound.add("StrongAir", { volume: 0.35 });
   jetFX.setMute(true);
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
+
+  //sound fx for bubble pop
+  let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
+  bubbleFX.setMute(true);
+
+   //sound fx for water drop
+   let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
+   waterFX.setMute(true);
+
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
   startButton = this.add
@@ -606,13 +609,14 @@ function create() {
         jetFX.setMute(false);
         bubbleFX.setMute(false);
         ballFX.setMute(false);
+        waterFX.setMute(false)
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
       }
     });
   mutedIcon.setScale(0.05).setDepth(1);
 }
-//---------------------------------------------------------------------------------------------
+//--------------------------------------------------------------update-------------------------------------------//
 //update function, runs repeatedly while phaser is loaded
 function update() {
   //if an object is outside the play area put it at its home location
