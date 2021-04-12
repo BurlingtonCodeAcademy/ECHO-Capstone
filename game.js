@@ -490,7 +490,7 @@ function create() {
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 390,
@@ -508,7 +508,7 @@ function create() {
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 450,
