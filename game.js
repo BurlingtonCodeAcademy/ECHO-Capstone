@@ -118,7 +118,7 @@ function create() {
   background.scaleY = ((config.height - 100) * heightScale) / background.height;
   background.scaleX = (config.width * widthScale) / background.width;
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
-  ground = this.matter.add.rectangle(400, 505, 800, 3, { isStatic: true });
+  ground = this.matter.add.rectangle(400, 505, 800, 4, { isStatic: true });
   scoreDisplay = this.add
     .text(40, 530, "Score: " + hoops.passCount)
     .setDepth(2);
@@ -178,7 +178,7 @@ function create() {
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
 
-  leaf = this.matter.add.image(170, 600, "leaf", null, {
+  leaf = this.matter.add.image(300, 600, "leaf", null, {
     shape: this.cache.json.get("leafShape").leaf,
     friction: 0.7,
     restitution: 0,
@@ -190,43 +190,42 @@ function create() {
   leaf.tint = 0x808080;
   this.input.setDraggable(leaf);
 
-  anvil = this.matter.add.image(200, 600, "anvil", null, {
+  anvil = this.matter.add.image(650, 650, "anvil", null, {
     shape: this.cache.json.get("anvilShape").anvil,
     friction: 0.7,
     restitution: 0,
     frictionAir: 0,
     gravityScale: { x: 0 },
   });
-  anvil.setInteractive().setScale((45 * widthScale) / anvil.width);
+  anvil.setInteractive().setScale((45 * heightScale) / anvil.height);
   anvil.name = "anvil";
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
 
-  balloon = this.matter.add.image(200, 600, "balloon", null, {
+  balloon = this.matter.add.image(170, 600, "balloon", null, {
     shape: this.cache.json.get("balloonShape").balloon,
     friction: 0.7,
-    restitution: 0,
-    frictionAir: 0.08,
-    gravityScale: { x: 0.2 },
+    density: 0.0007,
+    frictionAir: 0.12,
   });
-  balloon.setInteractive().setScale((45 * widthScale) / balloon.width);
+  balloon.setInteractive().setScale((55 * heightScale) / balloon.height);
   balloon.name = "balloon";
   balloon.tint = 0x808080;
   this.input.setDraggable(balloon);
 
-  fabric = this.matter.add.image(200, 600, "fabric", null, {
+  fabric = this.matter.add.image(225, 650, "fabric", null, {
     shape: this.cache.json.get("fabricShape").fabric,
     friction: 0.7,
     restitution: 0,
-    frictionAir: 0.08,
+    frictionAir: 0.04,
     gravityScale: { x: 0.2 },
   });
-  fabric.setInteractive().setScale((45 * widthScale) / fabric.width);
+  fabric.setInteractive().setScale((40 * heightScale) / fabric.height);
   fabric.name = "fabric";
   fabric.tint = 0x808080;
   this.input.setDraggable(fabric);
 
-  parachute = this.matter.add.image(200, 600, "parachute", null, {
+  parachute = this.matter.add.image(450, 600, "parachute", null, {
     shape: this.cache.json.get("parachuteShape").parachute,
     friction: 0.7,
     restitution: 0,
@@ -238,19 +237,19 @@ function create() {
   parachute.tint = 0x808080;
   this.input.setDraggable(parachute);
 
-  airplane = this.matter.add.image(200, 600, "airplane", null, {
+  airplane = this.matter.add.image(390, 655, "airplane", null, {
     shape: this.cache.json.get("airplaneShape").airplane,
     friction: 0.7,
     restitution: 0,
-    frictionAir: 0.08,
+    frictionAir: 0.06,
     gravityScale: { x: 0.2 },
   });
-  airplane.setInteractive().setScale((45 * widthScale) / airplane.width);
+  airplane.setInteractive().setScale((35 * heightScale) / airplane.height);
   airplane.name = "airplane";
   airplane.tint = 0x808080;
   this.input.setDraggable(airplane);
 
-  bubbleL = this.matter.add.image(215, 650, "bubble", null, {
+  bubbleL = this.matter.add.image(500, 655, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -275,7 +274,7 @@ function create() {
   bubbleL.tint = 0x808080;
   this.input.setDraggable(bubbleL);
 
-  bubbleM = this.matter.add.image(245, 635, "bubble", null, {
+  bubbleM = this.matter.add.image(530, 640, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -300,7 +299,7 @@ function create() {
   bubbleM.tint = 0x808080;
   this.input.setDraggable(bubbleM);
 
-  bubbleS = this.matter.add.image(227, 620, "bubble", null, {
+  bubbleS = this.matter.add.image(512, 625, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -325,7 +324,7 @@ function create() {
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
 
-  drop = this.matter.add.sprite(270, 600, "drop", 0, { shape: "circle" });
+  drop = this.matter.add.sprite(570, 595, "drop", 0, { shape: "circle" });
   this.anims.create({
     key: "splash",
     frames: this.anims.generateFrameNumbers("drop", { start: 0, end: 5 }),
@@ -430,7 +429,7 @@ function create() {
     airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 170,
+    homeX: 300,
     homeY: 600,
     floatRight: true
   };
@@ -440,8 +439,8 @@ function create() {
     airEff: 5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 215,
-    homeY: 650,
+    homeX: 500,
+    homeY: 655,
   };
   gameState.objectsArr.push(bubbleM);
   gameState.objData[bubbleM.name] = {
@@ -449,8 +448,8 @@ function create() {
     airEff: 3,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 245,
-    homeY: 635,
+    homeX: 530,
+    homeY: 640,
   };
   gameState.objectsArr.push(bubbleS);
   gameState.objData[bubbleS.name] = {
@@ -458,8 +457,8 @@ function create() {
     airEff: 1.5,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 227,
-    homeY: 620,
+    homeX: 512,
+    homeY: 625,
   };
   gameState.objectsArr.push(drop);
   gameState.objData[drop.name] = {
@@ -467,8 +466,8 @@ function create() {
     airEff: 1,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 270,
-    homeY: 600,
+    homeX: 570,
+    homeY: 595,
   };
   gameState.objectsArr.push(anvil);
   gameState.objData[anvil.name] = {
@@ -476,17 +475,17 @@ function create() {
     airEff: 0,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 280,
-    homeY: 645,
+    homeX: 650,
+    homeY: 650,
   };
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 4,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 295,
-    homeY: 660,
+    homeX: 170,
+    homeY: 600,
   };
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
@@ -494,17 +493,17 @@ function create() {
     airEff: 1,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 305,
-    homeY: 675,
+    homeX: 390,
+    homeY: 655,
   };
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 300,
-    airEff: 1,
+    airEff: 2,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 315,
-    homeY: 685,
+    homeX: 225,
+    homeY: 650,
   };
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
@@ -512,8 +511,8 @@ function create() {
     airEff: 1,
     flowPenalty: 0,
     unlockAt: 0,
-    homeX: 325,
-    homeY: 695,
+    homeX: 450,
+    homeY: 600,
   };
 
   

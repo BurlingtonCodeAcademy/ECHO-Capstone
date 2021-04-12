@@ -1,8 +1,8 @@
 {
 	"generator_info": "Shape definitions generated with PhysicsEditor. Visit https://www.codeandweb.com/physicseditor",
-	"parachute copy": {
+	"parachute": {
 		"type": "fromPhysicsEditor",
-		"label": "parachute copy",
+		"label": "parachute",
 		"isStatic": false,
 		"density": 0.1,
 		"restitution": 0,
