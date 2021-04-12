@@ -33,7 +33,7 @@ function preload() {
   this.load.image("baseOff", "assets/images/OffButtonBase.png"); 
   this.load.image("button", "assets/images/blowerbutton-start.png");
   this.load.image("buttonDisabled", "assets/images/blowerbutton-pressed.png");
-  this.load.image("square", "assets/images/redSquare.png");
+  this.load.image("leaf", "assets/images/leaf.png");
   this.load.image("hoop0", "assets/images/tall-hoop.png");
   this.load.image("hoop1", "assets/images/short-hoop.png");
   this.load.image("hoopFront", "assets/images/hoop-half.png");
@@ -45,11 +45,13 @@ function preload() {
     frameWidth: 170,
     frameHeight: 75,
   });
+  this.load.json("leafShape", "json/leaf.json");
   //------------------------------------------Audio Preloading-----------------------------//
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
   this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
   this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"])
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
     "rexdragrotateplugin",
@@ -64,7 +66,7 @@ let button;
 let ground;
 let orangeBall;
 let ball2;
-let redSquare;
+let leaf;
 let bubbleL;
 let bubbleM;
 let bubbleS;
@@ -129,6 +131,11 @@ function create() {
     restitution: 0.5,
     shape: "circle",
   });
+
+  //sound fx for ball bounce
+  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
+  ballFX.setMute(true);
+
   orangeBall
     .setInteractive()
     .setScale((30 * widthScale) / orangeBall.width)
@@ -142,10 +149,6 @@ function create() {
     });
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
-
-  //sound fx for ball bounce
-  let ballFX = this.sound.add("ballBounce", { volume: 0.55 });
-  ballFX.setMute(true);
 
   ball2 = this.matter.add.image(100, 650, "ball", null, {
     friction: 0.5,
@@ -167,14 +170,17 @@ function create() {
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
 
-  redSquare = this.matter.add.image(170, 600, "square", null, {
+  leaf = this.matter.add.image(170, 600, "leaf", null, {
+    shape: this.cache.json.get("leafShape").leaf,
     friction: 0.7,
-    restitution: 0.3,
+    restitution: 0,
+    frictionAir: 0.08,
+    gravityScale: { x: 0.2 },
   });
-  redSquare.setInteractive();
-  redSquare.name = "squareA";
-  redSquare.tint = 0x808080;
-  this.input.setDraggable(redSquare);
+  leaf.setInteractive().setScale((45 * widthScale) / leaf.width);
+  leaf.name = "leaf";
+  leaf.tint = 0x808080;
+  this.input.setDraggable(leaf);
 
   //sound fx for bubble pop
   let bubbleFX = this.sound.add("BubblePop", { volume: 0.55 });
@@ -255,6 +261,10 @@ function create() {
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
 
+  //sound fx for water drop
+  let waterFX = this.sound.add("waterDrop", { volume: 0.55 });
+  waterFX.setMute(true);
+
   drop = this.matter.add.sprite(270, 600, "drop", 0, { shape: "circle" });
   this.anims.create({
     key: "splash",
@@ -281,6 +291,7 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
+        waterFX.play();
         drop.setStatic(true);
         hoops.hoopState[drop.name][0] = "empty";
         hoops.hoopState[drop.name][1] = "empty";
@@ -340,11 +351,11 @@ function create() {
     homeX: 100,
     homeY: 650,
   };
-  gameState.objectsArr.push(redSquare);
-  gameState.objData[redSquare.name] = {
+  gameState.objectsArr.push(leaf);
+  gameState.objData[leaf.name] = {
     scoreVal: 150,
-    airEff: 0.4,
-    flowPenalty: 8,
+    airEff: 2.5,
+    flowPenalty: 0,
     unlockAt: 0,
     homeX: 170,
     homeY: 600,
@@ -438,7 +449,8 @@ function create() {
       if (
         jetFX.setMute(false) &&
         bubbleFX.setMute(false) &&
-        ballFX.setMute(false)
+        ballFX.setMute(false) &&
+        waterFX.setMute(false)
       ) {
         jetFX.setMute(true)
         bubbleFX.setMute(true)
@@ -455,10 +467,11 @@ function create() {
       if (
         jetFX.setMute(true) &&
         bubbleFX.setMute(true) &&
-        ballFX.setMute(true)
+        ballFX.setMute(true) &&
+        waterFX.setMute(true)
       ) {
-        jetFX.setMute(false)
-        bubbleFX.setMute(false)
+        jetFX.setMute(false);
+        bubbleFX.setMute(false);
         ballFX.setMute(false);
         mutedIcon.setDepth(-6);
         speakerIcon.setDepth(1);
@@ -475,6 +488,7 @@ function update() {
       gameObj.setStatic(true);
       gameObj.x = gameState.objData[gameObj.name].homeX;
       gameObj.y = gameState.objData[gameObj.name].homeY;
+      gameObj.rotation = 0;
     }
   });
   //if the game is running, adjust the length of the time display
@@ -494,6 +508,12 @@ function update() {
     drop.rotation =
       Math.atan2(drop.body.velocity.y, drop.body.velocity.x) - Math.PI / 2;
   }
+  //leaf falling behavior
+  if (!leaf.isStatic() && leaf.body.velocity.y > 0.1 && Date.now() % 140 < 3) {
+    let force = (Math.random() - 0.5) * 0.5;
+    leaf.setAngularVelocity(force);
+    this.matter.applyForceFromAngle(leaf, force * 0.1, 0);
+  }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
@@ -503,6 +523,7 @@ function update() {
     this.sound.get("StrongAir").stop(); //stops the air sound effects
     this.sound.get("BubblePop").stop();
     this.sound.get("ballBounce").stop();
+    this.sound.get("waterDrop").stop();
     jets.enabled[0] = false;
     jets.enabled[1] = false;
     jets.enabled[2] = false;
