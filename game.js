@@ -409,6 +409,9 @@ function create() {
       hoops.passCount -= Math.floor(
         gameState.objData[gameObject.name].scoreVal * 0.4
       );
+      if (hoops.passCount < 0) {
+        hoops.passCount = 0;
+      }
       scoreDisplay.text = "Score: " + hoops.passCount;
     }
   });
@@ -436,7 +439,7 @@ function create() {
     homeX: 100,
     homeY: 650,
   };
-  this.add.text(85, 600, gameState.objData[ball2.name].unlockAt)
+  this.add.text(85, 600, gameState.objData[ball2.name].unlockAt);
   gameState.objectsArr.push(leaf);
   gameState.objData[leaf.name] = {
     scoreVal: 250,
@@ -447,7 +450,7 @@ function create() {
     homeY: 600,
     floatRight: true,
   };
-  this.add.text(280,620,gameState.objData[leaf.name].unlockAt)
+  this.add.text(280, 620, gameState.objData[leaf.name].unlockAt);
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
     scoreVal: 400,
@@ -475,7 +478,7 @@ function create() {
     homeX: 512,
     homeY: 625,
   };
-  this.add.text(490,600,gameState.objData[bubbleL.name].unlockAt)
+  this.add.text(490, 600, gameState.objData[bubbleL.name].unlockAt);
   gameState.objectsArr.push(drop);
   gameState.objData[drop.name] = {
     scoreVal: 450,
@@ -485,7 +488,7 @@ function create() {
     homeX: 570,
     homeY: 595,
   };
-  this.add.text(555, 620, gameState.objData[drop.name].unlockAt)
+  this.add.text(555, 620, gameState.objData[drop.name].unlockAt);
   gameState.objectsArr.push(anvil);
   gameState.objData[anvil.name] = {
     scoreVal: 300,
@@ -495,7 +498,7 @@ function create() {
     homeX: 650,
     homeY: 650,
   };
-  this.add.text(625,610,gameState.objData[anvil.name].unlockAt)
+  this.add.text(625, 610, gameState.objData[anvil.name].unlockAt);
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 150,
@@ -505,7 +508,7 @@ function create() {
     homeX: 170,
     homeY: 600,
   };
-  this.add.text(150,630,gameState.objData[balloon.name].unlockAt)
+  this.add.text(150, 630, gameState.objData[balloon.name].unlockAt);
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
@@ -515,7 +518,7 @@ function create() {
     homeX: 375,
     homeY: 655,
   };
-  this.add.text(350,620,gameState.objData[airplane.name].unlockAt)
+  this.add.text(350, 620, gameState.objData[airplane.name].unlockAt);
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 200,
@@ -525,7 +528,7 @@ function create() {
     homeX: 225,
     homeY: 650,
   };
-  this.add.text(210,615,gameState.objData[fabric.name].unlockAt)
+  this.add.text(210, 615, gameState.objData[fabric.name].unlockAt);
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
     scoreVal: 350,
@@ -534,9 +537,9 @@ function create() {
     unlockAt: 700,
     homeX: 445,
     homeY: 600,
-    floatRight: false
+    floatRight: false,
   };
-  this.add.text(430,650,gameState.objData[parachute.name].unlockAt)
+  this.add.text(430, 650, gameState.objData[parachute.name].unlockAt);
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -695,26 +698,29 @@ function update() {
     leaf.rotation = leaf.rotation - 0.02 * floatDir;
   }
   //Airplane falling behavior
-  if(!airplane.isStatic() && airplane.body.velocity.y > 0.2 && Math.abs(airplane.rotation) < (Math.PI / 4)){
-    this.matter.applyForceFromAngle(airplane, .001)
+  if (
+    !airplane.isStatic() &&
+    airplane.body.velocity.y > 0.2 &&
+    Math.abs(airplane.rotation) < Math.PI / 4
+  ) {
+    this.matter.applyForceFromAngle(airplane, 0.001);
   }
   //parachute falling behavior
-  if(!parachute.isStatic() && parachute.body.velocity.y > 0.1){
-    if(parachute.rotation < Math.PI / -4){
-      gameState.objData[parachute.name].floatRight = false
-    }else if(parachute.rotation > Math.PI / 4){
-      gameState.objData[parachute.name].floatRight = true
+  if (!parachute.isStatic() && parachute.body.velocity.y > 0.1) {
+    if (parachute.rotation < Math.PI / -4) {
+      gameState.objData[parachute.name].floatRight = false;
+    } else if (parachute.rotation > Math.PI / 4) {
+      gameState.objData[parachute.name].floatRight = true;
     }
-    if(gameState.objData[parachute.name].floatRight){
-      parachute.rotation = parachute.rotation - .02
-    }else{
-      parachute.rotation = parachute.rotation + .02
+    if (gameState.objData[parachute.name].floatRight) {
+      parachute.rotation = parachute.rotation - 0.02;
+    } else {
+      parachute.rotation = parachute.rotation + 0.02;
     }
   }
   //check for game end
   if (gameState.running && Date.now() > gameState.gameEnd) {
     //stop game and disable jets
-    // console.log('X: ' + orangeBall.body.velocity.x + ', Y: ' + orangeBall.body.velocity.y)
     gameState.running = false;
     startButton.setDepth(1);
     this.sound.get("StrongAir").stop(); //stops the air sound effects
