@@ -66,7 +66,7 @@ function preload() {
   // this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("StrongAir", ["assets/sfx/StrongAir.mp3"]); //loads in sound asset
   this.load.audio("BubblePop", ["assets/sfx/BubblePop.mp3"]);
-  this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
+  this.load.audio("ballBounce", ["assets/sfx/ballBounce.mp3"]);
   this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"]);
   this.load.audio("anvilDrop", ["assets/sfx/anvilDrop.mp3"]);
   this.load.audio("balloon", ["assets/sfx/balloonBonk.wav"]);
