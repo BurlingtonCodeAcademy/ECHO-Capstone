@@ -2,7 +2,7 @@
 const config = {
   type: Phaser.AUTO,
   width: 800,
-  height: 700,
+  height: 720,
   backgroundColor: "#003555",
   physics: {
     default: "matter",
@@ -20,7 +20,7 @@ const config = {
 const game = new Phaser.Game(config);
 
 const widthScale = 800 / config.width;
-const heightScale = 600 / (config.height - 100);
+const heightScale = 600 / (config.height - 120);
 
 //load assets and plugins
 function preload() {
@@ -118,7 +118,7 @@ let gameState = {
 function create() {
   //create background, ground, set world bounds, and display score and high score
   let background = this.add.image(400, 300, "background").setDepth(-5);
-  background.scaleY = ((config.height - 100) * heightScale) / background.height;
+  background.scaleY = ((config.height - 120) * heightScale) / background.height;
   background.scaleX = (config.width * widthScale) / background.width;
   this.matter.world.setBounds(0, 0, game.config.width, game.config.height);
   ground = this.matter.add.rectangle(400, 505, 800, 4, { isStatic: true });
@@ -443,7 +443,7 @@ function create() {
     homeX: 100,
     homeY: 645,
   };
-  this.add.text(85, 595, gameState.objData[ball2.name].unlockAt);
+  this.add.text(85, 685, gameState.objData[ball2.name].unlockAt);
   gameState.objectsArr.push(leaf);
   gameState.objData[leaf.name] = {
     scoreVal: 250,
@@ -454,7 +454,7 @@ function create() {
     homeY: 640,
     floatRight: true,
   };
-  this.add.text(305, 610, gameState.objData[leaf.name].unlockAt);
+  this.add.text(305, 685, gameState.objData[leaf.name].unlockAt);
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
     scoreVal: 400,
@@ -482,7 +482,7 @@ function create() {
     homeX: 592,
     homeY: 625,
   };
-  this.add.text(580, 600, gameState.objData[bubbleL.name].unlockAt);
+  this.add.text(580, 685, gameState.objData[bubbleL.name].unlockAt);
   gameState.objectsArr.push(drop);
   gameState.objData[drop.name] = {
     scoreVal: 450,
@@ -492,7 +492,7 @@ function create() {
     homeX: 655,
     homeY: 645,
   };
-  this.add.text(638, 610, gameState.objData[drop.name].unlockAt);
+  this.add.text(638, 685, gameState.objData[drop.name].unlockAt);
   gameState.objectsArr.push(anvil);
   gameState.objData[anvil.name] = {
     scoreVal: 300,
@@ -500,9 +500,9 @@ function create() {
     flowPenalty: 0,
     unlockAt: 1000,
     homeX: 740,
-    homeY: 650,
+    homeY: 640,
   };
-  this.add.text(715, 610, gameState.objData[anvil.name].unlockAt);
+  this.add.text(715, 685, gameState.objData[anvil.name].unlockAt);
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 150,
@@ -512,7 +512,7 @@ function create() {
     homeX: 175,
     homeY: 640,
   };
-  this.add.text(160, 595, gameState.objData[balloon.name].unlockAt);
+  this.add.text(160, 685, gameState.objData[balloon.name].unlockAt);
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
@@ -522,7 +522,7 @@ function create() {
     homeX: 440,
     homeY: 645,
   };
-  this.add.text(430, 610, gameState.objData[airplane.name].unlockAt);
+  this.add.text(430, 685, gameState.objData[airplane.name].unlockAt);
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 200,
@@ -532,7 +532,7 @@ function create() {
     homeX: 245,
     homeY: 640,
   };
-  this.add.text(230, 605, gameState.objData[fabric.name].unlockAt);
+  this.add.text(230, 685, gameState.objData[fabric.name].unlockAt);
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
     scoreVal: 350,
@@ -543,7 +543,7 @@ function create() {
     homeY: 630,
     floatRight: false,
   };
-  this.add.text(490, 590, gameState.objData[parachute.name].unlockAt);
+  this.add.text(500, 685, gameState.objData[parachute.name].unlockAt);
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -579,7 +579,7 @@ function create() {
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
   startButton = this.add
-    .image(750, 565, "button")
+    .image(750, 50, "button")
     .setInteractive()
     .on("pointerdown", () => {
       //when clicking the start button,
@@ -611,7 +611,7 @@ function create() {
 
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
-    .image(750, 565, "buttonDisabled")
+    .image(750, 50, "buttonDisabled")
     .setScale((80 * heightScale) / startButton.height);
   //button to toggle muting, starts muted then toggles sound on. Might pull out and make own function
   speakerIcon = this.add
