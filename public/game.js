@@ -518,7 +518,7 @@ function create() {
     scoreVal: 150,
     airEff: 4,
     flowPenalty: 0,
-    unlockAt: 0,
+    unlockAt: 250,
     homeX: 175,
     homeY: 640,
   };
