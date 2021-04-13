@@ -136,7 +136,7 @@ function create() {
   timeDisplay = this.add.line();
   timeDisplay.setDepth(5);
   timeDisplay.setStrokeStyle(10, 0xa8ff8b, 1);
-  timeDisplay.setTo(0, 520, 64, 520);
+  timeDisplay.setTo(0, 580, 64, 580);
   let sidebar = this.add.image(400, 655, "sidebar").setDepth(-5);
   sidebar.scaleX = (800 * widthScale) / sidebar.width;
   sidebar.scaleY = (130 * heightScale) / sidebar.height;
@@ -509,10 +509,10 @@ function create() {
     airEff: 0,
     flowPenalty: 0,
     unlockAt: 1000,
-    homeX: 740,
-    homeY: 640,
+    homeX: 725,
+    homeY: 645,
   };
-  this.add.text(715, 685, gameState.objData[anvil.name].unlockAt);
+  this.add.text(700, 685, gameState.objData[anvil.name].unlockAt);
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 150,
@@ -532,7 +532,7 @@ function create() {
     homeX: 440,
     homeY: 645,
   };
-  this.add.text(430, 685, gameState.objData[airplane.name].unlockAt);
+  this.add.text(400, 685, gameState.objData[airplane.name].unlockAt);
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 200,
@@ -608,7 +608,7 @@ function create() {
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
         gameState.gameEnd = Date.now() + 45000;
-        timeDisplay.setTo(0, 520, 864, 520);
+        timeDisplay.setTo(0, 580, 864, 580);
         baseOff[0].setDepth(-1);
         baseOn[0].setDepth(1);
         baseOff[1].setDepth(-1);
@@ -708,9 +708,9 @@ function update() {
   if (gameState.running) {
     timeDisplay.setTo(
       0,
-      520,
+      580,
       64 + ((gameState.gameEnd - Date.now()) / 45000) * 800,
-      520
+      580
     );
   }
   //if the water drop is not static, adjust its rotation based on its velocity
