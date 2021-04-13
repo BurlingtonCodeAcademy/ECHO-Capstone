@@ -613,6 +613,9 @@ function create() {
         baseOn[1].setDepth(1);
         baseOff[2].setDepth(-1);
         baseOn[2].setDepth(1);
+        if(title.visible){
+          title.setVisible(false)
+        }
         //gameState.objectsArr.forEach(printObj => {console.log(printObj.name + '- X: ' + printObj.x + ', Y: ' + printObj.y)})
       }
     });
