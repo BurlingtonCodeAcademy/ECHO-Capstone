@@ -15,6 +15,10 @@ const config = {
     create: create,
     update: update,
   },
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+},
 };
 
 const game = new Phaser.Game(config);
@@ -119,8 +123,6 @@ let gameState = {
 
 //create function, phaser calls it once when setting up
 function create() {
-  window.addEventListener("resize", resize);
-  resize();
   //create background, ground, set world bounds, and display score and high score
   let background = this.add.image(400, 300, "background").setDepth(-5);
   background.scaleY = ((config.height - 120) * heightScale) / background.height;
@@ -677,20 +679,6 @@ function create() {
       }
     });
   mutedIcon.setScale(0.05).setDepth(1);
-
-  //------------------------Responsive function----------------//
-  function resize() {
-    var canvas = game.canvas, width = window.innerWidth.offsetWidth, height = window.innerHeight;
-var wratio = width / height, ratio = canvas.width / canvas.height;
-
-if (wratio < ratio) {
-    canvas.style.width = width + 'px';
-    canvas.style.height = (width / ratio) + 'px';
-} else {
-    canvas.style.width = (height * ratio) + 'px';
-    canvas.style.height = height + 'px';
-}
-}
 }
 //--------------------------------------------------------------update-------------------------------------------//
 //update function, runs repeatedly while phaser is loaded
