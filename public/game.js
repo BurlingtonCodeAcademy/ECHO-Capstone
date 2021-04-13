@@ -65,7 +65,7 @@ function preload() {
   this.load.audio("ballBounce", ["assets/sfx/ballBounce.ogg"]);
   this.load.audio("waterDrop", ["assets/sfx/waterDrop.mp3"]);
   this.load.audio("anvilDrop", ["assets/sfx/anvilDrop.mp3"]);
-  this.load.audio("balloon", ["assets/sfx/balloon.mp3"]);
+  this.load.audio("balloon", ["assets/sfx/balloonBonk.wav"]);
   this.load.audio("paperPlane", ["assets/sfx/paperPlane.mp3"]);
   //----------------------------------------Extensions and plugins preload--------------------//
   this.load.plugin(
