@@ -141,7 +141,7 @@ function create() {
   createHoop(this, 535, 355, 1); //225
 
   //create floatable objects
-  orangeBall = this.matter.add.image(40, 600, "ball", null, {
+  orangeBall = this.matter.add.image(40, 640, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -162,7 +162,7 @@ function create() {
   orangeBall.name = "ballA";
   this.input.setDraggable(orangeBall);
 
-  ball2 = this.matter.add.image(100, 650, "ball", null, {
+  ball2 = this.matter.add.image(100, 645, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -182,7 +182,7 @@ function create() {
   ball2.tint = 0x808080;
   this.input.setDraggable(ball2);
 
-  leaf = this.matter.add.image(300, 600, "leaf", null, {
+  leaf = this.matter.add.image(320, 640, "leaf", null, {
     shape: this.cache.json.get("leafShape").leaf,
     friction: 0.7,
     restitution: 0,
@@ -194,7 +194,7 @@ function create() {
   leaf.tint = 0x808080;
   this.input.setDraggable(leaf);
 
-  anvil = this.matter.add.image(650, 650, "anvil", null, {
+  anvil = this.matter.add.image(740, 650, "anvil", null, {
     shape: this.cache.json.get("anvilShape").anvil,
     friction: 0.7,
     restitution: 0,
@@ -206,7 +206,7 @@ function create() {
   anvil.tint = 0x808080;
   this.input.setDraggable(anvil);
 
-  balloon = this.matter.add.image(170, 600, "balloon", null, {
+  balloon = this.matter.add.image(175, 640, "balloon", null, {
     shape: this.cache.json.get("balloonShape").balloon,
     friction: 0.7,
     density: 0.0007,
@@ -217,7 +217,7 @@ function create() {
   balloon.tint = 0x808080;
   this.input.setDraggable(balloon);
 
-  fabric = this.matter.add.image(225, 650, "fabric", null, {
+  fabric = this.matter.add.image(245, 640, "fabric", null, {
     shape: this.cache.json.get("fabricShape").fabric,
     friction: 0.7,
     restitution: 0,
@@ -229,7 +229,7 @@ function create() {
   fabric.tint = 0x808080;
   this.input.setDraggable(fabric);
 
-  parachute = this.matter.add.image(445, 600, "parachute", null, {
+  parachute = this.matter.add.image(510, 630, "parachute", null, {
     shape: this.cache.json.get("parachuteShape").parachute,
     friction: 0.7,
     restitution: 0,
@@ -241,7 +241,7 @@ function create() {
   parachute.tint = 0x808080;
   this.input.setDraggable(parachute);
 
-  airplane = this.matter.add.image(375, 655, "airplane", null, {
+  airplane = this.matter.add.image(440, 645, "airplane", null, {
     shape: this.cache.json.get("airplaneShape").airplane,
     friction: 0.7,
     restitution: 0,
@@ -253,7 +253,7 @@ function create() {
   airplane.tint = 0x808080;
   this.input.setDraggable(airplane);
 
-  bubbleL = this.matter.add.image(500, 655, "bubble", null, {
+  bubbleL = this.matter.add.image(580, 655, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -278,7 +278,7 @@ function create() {
   bubbleL.tint = 0x808080;
   this.input.setDraggable(bubbleL);
 
-  bubbleM = this.matter.add.image(530, 640, "bubble", null, {
+  bubbleM = this.matter.add.image(610, 640, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -303,7 +303,7 @@ function create() {
   bubbleM.tint = 0x808080;
   this.input.setDraggable(bubbleM);
 
-  bubbleS = this.matter.add.image(512, 625, "bubble", null, {
+  bubbleS = this.matter.add.image(592, 625, "bubble", null, {
     shape: "circle",
     frictionAir: 0.12,
     density: 0.0007,
@@ -328,7 +328,7 @@ function create() {
   bubbleS.tint = 0x808080;
   this.input.setDraggable(bubbleS);
 
-  drop = this.matter.add.sprite(570, 595, "drop", 0, { shape: "circle" });
+  drop = this.matter.add.sprite(655, 645, "drop", 0, { shape: "circle" });
   this.anims.create({
     key: "splash",
     frames: this.anims.generateFrameNumbers("drop", { start: 0, end: 5 }),
@@ -432,7 +432,7 @@ function create() {
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 40,
-    homeY: 600,
+    homeY: 640,
   };
   gameState.objectsArr.push(ball2);
   gameState.objData[ball2.name] = {
@@ -441,27 +441,27 @@ function create() {
     flowPenalty: 4,
     unlockAt: 150,
     homeX: 100,
-    homeY: 650,
+    homeY: 645,
   };
-  this.add.text(85, 600, gameState.objData[ball2.name].unlockAt);
+  this.add.text(85, 595, gameState.objData[ball2.name].unlockAt);
   gameState.objectsArr.push(leaf);
   gameState.objData[leaf.name] = {
     scoreVal: 250,
     airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 500,
-    homeX: 300,
-    homeY: 600,
+    homeX: 320,
+    homeY: 640,
     floatRight: true,
   };
-  this.add.text(280, 620, gameState.objData[leaf.name].unlockAt);
+  this.add.text(305, 610, gameState.objData[leaf.name].unlockAt);
   gameState.objectsArr.push(bubbleL);
   gameState.objData[bubbleL.name] = {
     scoreVal: 400,
     airEff: 5,
     flowPenalty: 0,
     unlockAt: 800,
-    homeX: 500,
+    homeX: 580,
     homeY: 655,
   };
   gameState.objectsArr.push(bubbleM);
@@ -470,7 +470,7 @@ function create() {
     airEff: 3,
     flowPenalty: 0,
     unlockAt: gameState.objData[bubbleL.name].unlockAt,
-    homeX: 530,
+    homeX: 610,
     homeY: 640,
   };
   gameState.objectsArr.push(bubbleS);
@@ -479,71 +479,71 @@ function create() {
     airEff: 1.5,
     flowPenalty: 0,
     unlockAt: gameState.objData[bubbleL.name].unlockAt,
-    homeX: 512,
+    homeX: 592,
     homeY: 625,
   };
-  this.add.text(490, 600, gameState.objData[bubbleL.name].unlockAt);
+  this.add.text(580, 600, gameState.objData[bubbleL.name].unlockAt);
   gameState.objectsArr.push(drop);
   gameState.objData[drop.name] = {
     scoreVal: 450,
     airEff: 1,
     flowPenalty: 0,
     unlockAt: 900,
-    homeX: 570,
-    homeY: 595,
+    homeX: 655,
+    homeY: 645,
   };
-  this.add.text(555, 620, gameState.objData[drop.name].unlockAt);
+  this.add.text(638, 610, gameState.objData[drop.name].unlockAt);
   gameState.objectsArr.push(anvil);
   gameState.objData[anvil.name] = {
     scoreVal: 300,
     airEff: 0,
     flowPenalty: 0,
     unlockAt: 1000,
-    homeX: 650,
+    homeX: 740,
     homeY: 650,
   };
-  this.add.text(625, 610, gameState.objData[anvil.name].unlockAt);
+  this.add.text(715, 610, gameState.objData[anvil.name].unlockAt);
   gameState.objectsArr.push(balloon);
   gameState.objData[balloon.name] = {
     scoreVal: 150,
     airEff: 4,
     flowPenalty: 0,
     unlockAt: 250,
-    homeX: 170,
-    homeY: 600,
+    homeX: 175,
+    homeY: 640,
   };
-  this.add.text(150, 630, gameState.objData[balloon.name].unlockAt);
+  this.add.text(160, 595, gameState.objData[balloon.name].unlockAt);
   gameState.objectsArr.push(airplane);
   gameState.objData[airplane.name] = {
     scoreVal: 300,
     airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 600,
-    homeX: 375,
-    homeY: 655,
+    homeX: 440,
+    homeY: 645,
   };
-  this.add.text(350, 620, gameState.objData[airplane.name].unlockAt);
+  this.add.text(430, 610, gameState.objData[airplane.name].unlockAt);
   gameState.objectsArr.push(fabric);
   gameState.objData[fabric.name] = {
     scoreVal: 200,
     airEff: 2,
     flowPenalty: 0,
     unlockAt: 400,
-    homeX: 225,
-    homeY: 650,
+    homeX: 245,
+    homeY: 640,
   };
-  this.add.text(210, 615, gameState.objData[fabric.name].unlockAt);
+  this.add.text(230, 605, gameState.objData[fabric.name].unlockAt);
   gameState.objectsArr.push(parachute);
   gameState.objData[parachute.name] = {
     scoreVal: 350,
     airEff: 2.5,
     flowPenalty: 0,
     unlockAt: 700,
-    homeX: 445,
-    homeY: 600,
+    homeX: 510,
+    homeY: 630,
     floatRight: false,
   };
-  this.add.text(430, 650, gameState.objData[parachute.name].unlockAt);
+  this.add.text(490, 590, gameState.objData[parachute.name].unlockAt);
 
   //use gameState's array to populate hoopState
   gameState.objectsArr.forEach((gameObj) => {
@@ -579,7 +579,7 @@ function create() {
   //--------------------------------------------buttons------------------------------------------//
   //setup start button
   startButton = this.add
-    .image(750, 650, "button")
+    .image(750, 565, "button")
     .setInteractive()
     .on("pointerdown", () => {
       //when clicking the start button,
@@ -597,7 +597,7 @@ function create() {
         jetPressure(this, 2);
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
-        gameState.gameEnd = Date.now() + 25000;
+        gameState.gameEnd = Date.now() + 45000;
         timeDisplay.setTo(0, 520, 864, 520);
         baseOff[0].setDepth(-1);
         baseOn[0].setDepth(1);
@@ -611,7 +611,7 @@ function create() {
 
   startButton.setScale((80 * heightScale) / startButton.height).setDepth(1);
   this.add
-    .image(750, 650, "buttonDisabled")
+    .image(750, 565, "buttonDisabled")
     .setScale((80 * heightScale) / startButton.height);
   //button to toggle muting, starts muted then toggles sound on. Might pull out and make own function
   speakerIcon = this.add
@@ -682,7 +682,7 @@ function update() {
     timeDisplay.setTo(
       0,
       520,
-      64 + ((gameState.gameEnd - Date.now()) / 25000) * 800,
+      64 + ((gameState.gameEnd - Date.now()) / 45000) * 800,
       520
     );
   }
