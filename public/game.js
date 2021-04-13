@@ -46,6 +46,8 @@ function preload() {
   this.load.image("airplane", "assets/images/airplane.png");
   this.load.image("fabric", "assets/images/fabric.png");
   this.load.image("parachute", "assets/images/parachute.png");
+  this.load.image('sidebar', 'assets/images/bottom-side-bar.jpg')
+  this.load.image('title', 'assets/images/Levitating-title.png')
   this.load.spritesheet("drop", "assets/images/waterAnimation.png", {
     frameWidth: 170,
     frameHeight: 75,
@@ -92,6 +94,7 @@ let drop;
 let scoreDisplay;
 let highDisplay;
 let timeDisplay;
+let title;
 let speakerIcon;
 let mutedIcon;
 let baseOn = [];
@@ -132,6 +135,11 @@ function create() {
   timeDisplay.setDepth(5);
   timeDisplay.setStrokeStyle(10, 0xa8ff8b, 1);
   timeDisplay.setTo(0, 520, 64, 520);
+  let sidebar = this.add.image(400,655, 'sidebar').setDepth(-5)
+  sidebar.scaleX = 800 * widthScale / sidebar.width
+  sidebar.scaleY = 130 * heightScale / sidebar.height
+  title = this.add.image(400, 50, 'title').setDepth(-4)
+  title.setScale(500 * widthScale / title.width)
 
   //create jets and hoops
   createJet(this, 130, 0);
