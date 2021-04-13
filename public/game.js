@@ -46,8 +46,8 @@ function preload() {
   this.load.image("airplane", "assets/images/airplane.png");
   this.load.image("fabric", "assets/images/fabric.png");
   this.load.image("parachute", "assets/images/parachute.png");
-  this.load.image('sidebar', 'assets/images/bottom-side-bar.jpg')
-  this.load.image('title', 'assets/images/Levitating-title.png')
+  this.load.image("sidebar", "assets/images/bottom-side-bar.jpg");
+  this.load.image("title", "assets/images/Levitating-title.png");
   this.load.spritesheet("drop", "assets/images/waterAnimation.png", {
     frameWidth: 170,
     frameHeight: 75,
@@ -119,6 +119,8 @@ let gameState = {
 
 //create function, phaser calls it once when setting up
 function create() {
+  window.addEventListener("resize", resize);
+  resize();
   //create background, ground, set world bounds, and display score and high score
   let background = this.add.image(400, 300, "background").setDepth(-5);
   background.scaleY = ((config.height - 120) * heightScale) / background.height;
@@ -135,11 +137,11 @@ function create() {
   timeDisplay.setDepth(5);
   timeDisplay.setStrokeStyle(10, 0xa8ff8b, 1);
   timeDisplay.setTo(0, 520, 64, 520);
-  let sidebar = this.add.image(400,655, 'sidebar').setDepth(-5)
-  sidebar.scaleX = 800 * widthScale / sidebar.width
-  sidebar.scaleY = 130 * heightScale / sidebar.height
-  title = this.add.image(400, 50, 'title').setDepth(-4)
-  title.setScale(500 * widthScale / title.width)
+  let sidebar = this.add.image(400, 655, "sidebar").setDepth(-5);
+  sidebar.scaleX = (800 * widthScale) / sidebar.width;
+  sidebar.scaleY = (130 * heightScale) / sidebar.height;
+  title = this.add.image(400, 50, "title").setDepth(-4);
+  title.setScale((500 * widthScale) / title.width);
 
   //create jets and hoops
   createJet(this, 130, 0);
@@ -391,7 +393,7 @@ function create() {
       balloonFX.play();
     }
     if (bodyA.label === "airplane" || bodyB.label === "airplane") {
-        planeFX.play();
+      planeFX.play();
     }
   });
 
@@ -580,7 +582,7 @@ function create() {
 
   let balloonFX = this.sound.add("balloon", { volume: 0.55 });
   balloonFX.setMute(true);
-  
+
   let planeFX = this.sound.add("paperPlane", { volume: 0.55 });
   planeFX.setMute(true);
 
@@ -672,6 +674,20 @@ function create() {
       }
     });
   mutedIcon.setScale(0.05).setDepth(1);
+
+  //------------------------Responsive function----------------//
+  function resize() {
+    var canvas = game.canvas, width = window.innerWidth.offsetWidth, height = window.innerHeight;
+var wratio = width / height, ratio = canvas.width / canvas.height;
+
+if (wratio < ratio) {
+    canvas.style.width = width + 'px';
+    canvas.style.height = (width / ratio) + 'px';
+} else {
+    canvas.style.width = (height * ratio) + 'px';
+    canvas.style.height = height + 'px';
+}
+}
 }
 //--------------------------------------------------------------update-------------------------------------------//
 //update function, runs repeatedly while phaser is loaded
