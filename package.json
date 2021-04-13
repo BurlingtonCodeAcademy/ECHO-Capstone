@@ -3,7 +3,7 @@
     "express": "^4.17.1"
   },
   "scripts": {
-    "heroku-postbuild": "cd client && npm install",
+    "heroku-postbuild": "cd public && npm install",
     "start": "node server.js"
   }
 }
