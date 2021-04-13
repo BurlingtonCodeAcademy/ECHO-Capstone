@@ -79,6 +79,9 @@ function preload() {
   );
 }
 //global variables
+
+const timerMax = 60000;
+
 //game objects
 let startButton;
 let fabric;
@@ -153,7 +156,7 @@ function create() {
   createHoop(this, 535, 355, 1); //225
 
   //create floatable objects
-  orangeBall = this.matter.add.image(40, 640, "ball", null, {
+  orangeBall = this.matter.add.image(40, 340, "ball", null, {
     friction: 0.5,
     restitution: 0.5,
     shape: "circle",
@@ -167,7 +170,6 @@ function create() {
         (!pair.bodyA.name || !pair.bodyA.name.startsWith("hoop")) &&
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
-        console.log("ball sound");
         ballFX.play();
       }
     });
@@ -279,11 +281,12 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         bubbleFX.play();
-        bubbleL.setStatic(true);
-        bubbleL.x = gameState.objData[bubbleL.name].homeX;
-        bubbleL.y = gameState.objData[bubbleL.name].homeY;
-        hoops.hoopState[bubbleL.name][0] = "empty";
-        hoops.hoopState[bubbleL.name][1] = "empty";
+        // bubbleL.setStatic(true);
+        // bubbleL.x = gameState.objData[bubbleL.name].homeX;
+        // bubbleL.y = gameState.objData[bubbleL.name].homeY;
+        // hoops.hoopState[bubbleL.name][0] = "empty";
+        // hoops.hoopState[bubbleL.name][1] = "empty";
+        gameState.objData[bubbleL.name].teleporting = true
       }
     });
   bubbleL.name = "bubbleLarge";
@@ -304,11 +307,12 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         bubbleFX.play();
-        bubbleM.setStatic(true);
-        bubbleM.x = gameState.objData[bubbleM.name].homeX;
-        bubbleM.y = gameState.objData[bubbleM.name].homeY;
-        hoops.hoopState[bubbleM.name][0] = "empty";
-        hoops.hoopState[bubbleM.name][1] = "empty";
+        // bubbleM.setStatic(true);
+        // bubbleM.x = gameState.objData[bubbleM.name].homeX;
+        // bubbleM.y = gameState.objData[bubbleM.name].homeY;
+        // hoops.hoopState[bubbleM.name][0] = "empty";
+        // hoops.hoopState[bubbleM.name][1] = "empty";
+        gameState.objData[bubbleM.name].teleporting = true
       }
     });
   bubbleM.name = "bubbleMedium";
@@ -329,11 +333,12 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         bubbleFX.play();
-        bubbleS.setStatic(true);
-        bubbleS.x = gameState.objData[bubbleS.name].homeX;
-        bubbleS.y = gameState.objData[bubbleS.name].homeY;
-        hoops.hoopState[bubbleS.name][0] = "empty";
-        hoops.hoopState[bubbleS.name][1] = "empty";
+        // bubbleS.setStatic(true);
+        // bubbleS.x = gameState.objData[bubbleS.name].homeX;
+        // bubbleS.y = gameState.objData[bubbleS.name].homeY;
+        // hoops.hoopState[bubbleS.name][0] = "empty";
+        // hoops.hoopState[bubbleS.name][1] = "empty";
+        gameState.objData[bubbleS.name].teleporting = true
       }
     });
   bubbleS.name = "bubbleSmall";
@@ -367,13 +372,15 @@ function create() {
         (!pair.bodyB.name || !pair.bodyB.name.startsWith("hoop"))
       ) {
         waterFX.play();
-        if (!drop.isStatic()) {
-          drop.setStatic(true);
-        }
-        drop.setCollisionCategory(null);
-        hoops.hoopState[drop.name][0] = "empty";
-        hoops.hoopState[drop.name][1] = "empty";
+        // if (!drop.isStatic()) {
+        //   drop.setStatic(true);
+        // }
+        // drop.setCollisionCategory(null);
+        // hoops.hoopState[drop.name][0] = "empty";
+        // hoops.hoopState[drop.name][1] = "empty";
         drop.anims.play("splash");
+        gameState.objData[drop.name].teleporting = true
+        gameState.objData[drop.name].prevRotate = drop.rotation
       }
     })
     .on("animationcomplete", () => {
@@ -382,6 +389,7 @@ function create() {
       drop.rotation = 0;
       drop.setCollisionCategory(1);
       drop.anims.play("normalDrop");
+
     });
   drop.name = "waterDrop";
   drop.tint = 0x808080;
@@ -398,6 +406,33 @@ function create() {
       planeFX.play();
     }
   });
+  this.game.events.on('prerender', () => {
+    if(gameState.objData[drop.name].teleporting){
+      drop.rotation = gameState.objData[drop.name].prevRotate
+    }
+  })
+  this.game.events.on('postrender', () => {
+    gameState.objectsArr.forEach(warpObj => {
+      if(warpObj.name.startsWith('bubble') && gameState.objData[warpObj.name].teleporting){
+        if(!warpObj.isStatic()){
+          warpObj.setStatic(true)}
+          warpObj.x = gameState.objData[warpObj.name].homeX
+          warpObj.y = gameState.objData[warpObj.name].homeY
+          hoops.hoopState[warpObj.name][0] = 'empty'
+          hoops.hoopState[warpObj.name][1] = 'empty'
+          gameState.objData[warpObj.name].teleporting = false
+        
+      }else if(warpObj.name === 'waterDrop' && gameState.objData[warpObj.name].teleporting){
+        if (!drop.isStatic()) {
+          drop.setStatic(true);
+        }
+        drop.setCollisionCategory(null);
+        hoops.hoopState[drop.name][0] = "empty";
+        hoops.hoopState[drop.name][1] = "empty";
+        gameState.objData[warpObj.name].teleporting = false
+      }
+    })
+  })
 
   //drag events
   this.input.on("drag", (pointer, gameObject, x, y) => {
@@ -444,7 +479,7 @@ function create() {
     flowPenalty: 0,
     unlockAt: 0,
     homeX: 40,
-    homeY: 640,
+    homeY: 650,
   };
   gameState.objectsArr.push(ball2);
   gameState.objData[ball2.name] = {
@@ -475,6 +510,7 @@ function create() {
     unlockAt: 800,
     homeX: 580,
     homeY: 655,
+    teleporting: false,
   };
   gameState.objectsArr.push(bubbleM);
   gameState.objData[bubbleM.name] = {
@@ -484,6 +520,7 @@ function create() {
     unlockAt: gameState.objData[bubbleL.name].unlockAt,
     homeX: 610,
     homeY: 640,
+    teleporting: false,
   };
   gameState.objectsArr.push(bubbleS);
   gameState.objData[bubbleS.name] = {
@@ -493,6 +530,7 @@ function create() {
     unlockAt: gameState.objData[bubbleL.name].unlockAt,
     homeX: 592,
     homeY: 625,
+    teleporting: false,
   };
   this.add.text(580, 685, gameState.objData[bubbleL.name].unlockAt);
   gameState.objectsArr.push(drop);
@@ -503,6 +541,8 @@ function create() {
     unlockAt: 900,
     homeX: 655,
     homeY: 645,
+    teleporting: false,
+    prevRotate: 0,
   };
   this.add.text(638, 685, gameState.objData[drop.name].unlockAt);
   gameState.objectsArr.push(anvil);
@@ -609,7 +649,7 @@ function create() {
         jetPressure(this, 2);
         hoops.passCount = 0;
         scoreDisplay.text = "Score: " + hoops.passCount;
-        gameState.gameEnd = Date.now() + 45000;
+        gameState.gameEnd = Date.now() + timerMax;
         timeDisplay.setTo(0, 580, 864, 580);
         baseOff[0].setDepth(-1);
         baseOn[0].setDepth(1);
@@ -620,7 +660,6 @@ function create() {
         if(title.visible){
           title.setVisible(false)
         }
-        //gameState.objectsArr.forEach(printObj => {console.log(printObj.name + '- X: ' + printObj.x + ', Y: ' + printObj.y)})
       }
     });
 
@@ -697,7 +736,7 @@ function update() {
     timeDisplay.setTo(
       0,
       580,
-      64 + ((gameState.gameEnd - Date.now()) / 45000) * 800,
+      64 + ((gameState.gameEnd - Date.now()) / timerMax) * 800,
       580
     );
   }
